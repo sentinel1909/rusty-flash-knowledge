@@ -9,6 +9,7 @@ struct ServerState {
 }
 #[derive(Debug, Clone, serde::Deserialize)]
 pub struct ApplicationConfig {
+    pub database: app::configuration::DatabbaseConfig,
     pub server: app::configuration::ServerConfig,
 }
 pub struct ApplicationState {}

@@ -2,12 +2,16 @@ use pavex::blueprint::Blueprint;
 use pavex::server::IncomingStream;
 use pavex::t;
 use pavex::time::SignedDuration;
+use secrecy::{ExposeSecret, SecretString};
 use serde::Deserialize;
+use serde_aux::field_attributes::deserialize_number_from_string;
+use sqlx::postgres::{PgPool, PgConnectOptions, PgSslMode};
 
 /// Refer to Pavex's [configuration guide](https://pavex.dev/docs/guide/configuration) for more details
 /// on how to manage configuration values.
 pub fn register(bp: &mut Blueprint) {
     bp.config("server", t!(self::ServerConfig));
+    bp.config("database", t!(self::DatabbaseConfig));
 }
 
 #[derive(serde::Deserialize, Debug, Clone)]
@@ -54,5 +58,40 @@ impl ServerConfig {
     pub async fn listener(&self) -> Result<IncomingStream, std::io::Error> {
         let addr = std::net::SocketAddr::new(self.ip, self.port);
         IncomingStream::bind(addr).await
+    }
+}
+
+// struct type to represent the database configuration
+#[derive(Clone, Debug, Deserialize)]
+pub struct DatabbaseConfig {
+    pub username: String,
+    pub password: SecretString,
+    #[serde(deserialize_with = "deserialize_number_from_string")]
+    pub port: u16,
+    pub host: String,
+    pub database_name: String,
+    pub require_ssl: bool,
+}
+
+// methods for the database configuration type
+impl DatabbaseConfig {
+    pub fn connection_options(&self) -> PgConnectOptions {
+        let ssl_mode = if self.require_ssl {
+            PgSslMode::Require
+        } else  {
+            PgSslMode::Prefer
+        };
+        PgConnectOptions::new()
+            .host(&self.host)
+            .username(&self.username)
+            .password(self.password.expose_secret())
+            .port(self.port)
+            .ssl_mode(ssl_mode)
+            .database(&self.database_name)
+    }
+
+    pub async fn get_pool(&self) -> Result<PgPool, sqlx::Error> {
+        let pool = PgPool::connect_with(self.connection_options()).await?;
+        Ok(pool)
     }
 }
