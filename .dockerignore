@@ -1,0 +1,19 @@
+# rusty-flash-knowledge api project - files ignored from deployment via Dockerfile
+
+# dotfiles and folders
+.dockerignore
+.github/
+.env
+
+# Configuration
+deny.toml
+
+# Docker
+Dockerfile
+
+# Development related
+server/tests/
+server/configuration/dev.yml
+
+# Build artifacts
+target/

@@ -1,0 +1,10 @@
+# rusty-flash-knowledge api project - files ignored from the repo
+
+# VS Code Settings
+.vscode
+
+# Build artifacts
+/target
+
+# Environment variables
+.env
