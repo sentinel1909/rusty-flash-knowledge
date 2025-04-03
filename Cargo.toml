@@ -7,10 +7,10 @@ default-members = ["server"]
 resolver = "3"
 
 [workspace.package]
-version = "0.2.0"
+version = "0.3.0"
 edition = "2024"
 description = "A CRUD API to power the backend of a flash card application."
-authors = [ "Jeffery D Mitchell", "<crusty-rustacean@jeff-mitchell.dev>" ]
+authors = ["Jeffery D Mitchell", "<crusty-rustacean@jeff-mitchell.dev>"]
 readme = "README.md"
 repository = "https://github.com/sentinel1909/rusty-flash-knowledge.git"
 license = "MIT"
