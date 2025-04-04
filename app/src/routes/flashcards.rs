@@ -1,7 +1,9 @@
 // app/src/routes/flashcards.rs
 
 // dependencies
+use crate::configuration::DatabaseConfig;
 use crate::models::{FlashCard, NewFlashCard};
+use crate::queries::list_flashcards;
 use pavex::request::body::JsonBody;
 use pavex::request::path::PathParams;
 use pavex::response::{Response, body::Json};
@@ -13,10 +15,11 @@ pub struct FlashCardParams {
 }
 
 // handler which lists all the flash cards in the database
-pub async fn list_flashcards_handler() -> Response {
-    let cards: Vec<FlashCard> = Vec::new();
+pub async fn list_flashcards_handler(db: &DatabaseConfig) -> Response {
+    let pool = db.get_pool().await.unwrap();
+    let flash_cards = list_flashcards(pool).await;
 
-    let json = Json::new(cards).expect("Unable to serialize response body.");
+    let json = Json::new(flash_cards).expect("Unable to serialize response body.");
     Response::ok().set_typed_body(json)
 }
 

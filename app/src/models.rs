@@ -4,7 +4,7 @@
 
 // dependencies
 use crate::errors::FlashcardValidationError;
-use jiff_sqlx::{Timestamp as SqlxTimestamp, ToSqlx};
+use chrono::{DateTime, Utc};
 use pavex::time::Timestamp;
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
@@ -20,10 +20,8 @@ pub struct FlashCard {
     pub topic: Option<String>,
     pub tags: Option<Vec<String>>,
     pub difficulty: Option<i32>,
-    #[serde(with = "pavex::time::fmt::serde::timestamp::second::required")]
-    pub created_at: SqlxTimestamp,
-    #[serde(with = "pavex::time::fmt::serde::timestamp::second::required")]
-    pub updated_at: SqlxTimestamp,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
 }
 
 // implement the TryFrom trait, which aids in converting new data into the domain data model
@@ -45,8 +43,6 @@ impl TryFrom<NewFlashCard> for FlashCard {
             }
         }
 
-        let now = Timestamp::now().to_sqlx();
-
         Ok(Self {
             id: Uuid::new_v4(),
             question: new.question.trim().to_string(),
@@ -54,8 +50,8 @@ impl TryFrom<NewFlashCard> for FlashCard {
             topic: new.topic.map(|s| s.trim().to_string()),
             tags: new.tags,
             difficulty: new.difficulty,
-            created_at: now,
-            updated_at: now,
+            created_at: Utc::now(),
+            updated_at: Utc::now(),
         })
     }
 }
