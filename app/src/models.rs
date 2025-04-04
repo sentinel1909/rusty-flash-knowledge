@@ -4,6 +4,7 @@
 
 // dependencies
 use crate::errors::FlashcardValidationError;
+use jiff_sqlx::{Timestamp as SqlxTimestamp, ToSqlx};
 use pavex::time::Timestamp;
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
@@ -19,8 +20,10 @@ pub struct FlashCard {
     pub topic: Option<String>,
     pub tags: Option<Vec<String>>,
     pub difficulty: Option<i32>,
-    pub created_at: Timestamp,
-    pub updated_at: Timestamp,
+    #[serde(with = "pavex::time::fmt::serde::timestamp::second::required")]
+    pub created_at: SqlxTimestamp,
+    #[serde(with = "pavex::time::fmt::serde::timestamp::second::required")]
+    pub updated_at: SqlxTimestamp,
 }
 
 // implement the TryFrom trait, which aids in converting new data into the domain data model
@@ -42,6 +45,8 @@ impl TryFrom<NewFlashCard> for FlashCard {
             }
         }
 
+        let now = Timestamp::now().to_sqlx();
+
         Ok(Self {
             id: Uuid::new_v4(),
             question: new.question.trim().to_string(),
@@ -49,14 +54,14 @@ impl TryFrom<NewFlashCard> for FlashCard {
             topic: new.topic.map(|s| s.trim().to_string()),
             tags: new.tags,
             difficulty: new.difficulty,
-            created_at: Timestamp::now(),
-            updated_at: Timestamp::now(),
+            created_at: now,
+            updated_at: now,
         })
     }
 }
 
 // struct type to represent a new flash card, coming in as an input
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Default, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct NewFlashCard {
     pub question: String,

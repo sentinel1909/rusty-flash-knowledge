@@ -6,6 +6,6 @@ CREATE TABLE IF NOT EXISTS flashcards (
     topic TEXT,
     tags TEXT[],
     difficulty INT,
-    created_at TIMESTAMP DEFAULT now(),
-    updated_at TIMESTAMP DEFAULT now()
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

@@ -1,4 +1,4 @@
-use pavex::{config::ConfigLoader, server::Server};
+use pavex::{config::ConfigLoader, http::HeaderValue, server::Server};
 use server::configuration::Profile;
 use server_sdk::{ApplicationConfig, ApplicationState, run};
 use std::sync::Once;
@@ -75,7 +75,23 @@ impl TestApi {
 impl TestApi {
     pub async fn get_ping(&self) -> reqwest::Response {
         self.api_client
-            .get(format!("{}/api/ping", &self.api_address))
+            .get(format!("{}/v1/ping", &self.api_address))
+            .header(
+                reqwest::header::HOST,
+                HeaderValue::from_static("api.rusty-flash-knowledge.net"),
+            )
+            .send()
+            .await
+            .expect("Failed to execute request.")
+    }
+
+    pub async fn get_flashcards(&self) -> reqwest::Response {
+        self.api_client
+            .get(format!("{}/v1/flashcards", &self.api_address))
+            .header(
+                reqwest::header::HOST,
+                HeaderValue::from_static("api.rusty-flash-knowledge.net"),
+            )
             .send()
             .await
             .expect("Failed to execute request.")
