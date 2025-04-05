@@ -1,6 +1,7 @@
-use pavex::{config::ConfigLoader, server::Server};
+use pavex::{config::ConfigLoader, http::HeaderValue, server::Server};
 use server::configuration::Profile;
 use server_sdk::{ApplicationConfig, ApplicationState, run};
+use sqlx::PgPool;
 use std::sync::Once;
 use tracing::subscriber::set_global_default;
 use tracing_subscriber::EnvFilter;
@@ -8,13 +9,13 @@ use tracing_subscriber::EnvFilter;
 pub struct TestApi {
     pub api_address: String,
     pub api_client: reqwest::Client,
+    pub db_pool: PgPool,
 }
 
 impl TestApi {
     pub async fn spawn() -> Self {
         Self::init_telemetry();
         let config = Self::get_config();
-
         let tcp_listener = config
             .server
             .listener()
@@ -25,6 +26,7 @@ impl TestApi {
             .expect("The server TCP listener doesn't have a local socket address");
         let server_builder = Server::new().listen(tcp_listener);
         let api_address = format!("http://{}:{}", config.server.ip, address.port());
+        let db = config.database.get_pool().await.unwrap();
 
         let application_state = ApplicationState::new(config)
             .await
@@ -35,6 +37,7 @@ impl TestApi {
         TestApi {
             api_address,
             api_client: reqwest::Client::new(),
+            db_pool: db,
         }
     }
 
@@ -75,7 +78,23 @@ impl TestApi {
 impl TestApi {
     pub async fn get_ping(&self) -> reqwest::Response {
         self.api_client
-            .get(format!("{}/api/ping", &self.api_address))
+            .get(format!("{}/v1/ping", &self.api_address))
+            .header(
+                reqwest::header::HOST,
+                HeaderValue::from_static("api.rusty-flash-knowledge.net"),
+            )
+            .send()
+            .await
+            .expect("Failed to execute request.")
+    }
+
+    pub async fn get_flashcards(&self) -> reqwest::Response {
+        self.api_client
+            .get(format!("{}/v1/flashcards", &self.api_address))
+            .header(
+                reqwest::header::HOST,
+                HeaderValue::from_static("api.rusty-flash-knowledge.net"),
+            )
             .send()
             .await
             .expect("Failed to execute request.")

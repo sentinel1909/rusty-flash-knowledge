@@ -4,13 +4,13 @@
 
 // dependencies
 use crate::errors::FlashcardValidationError;
-use pavex::time::Timestamp;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use uuid::Uuid;
 
 // struct type to represent a flash card
-#[derive(Debug, Deserialize, Serialize, FromRow, PartialEq)]
+#[derive(Debug, Deserialize, Eq, Serialize, FromRow, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct FlashCard {
     pub id: Uuid,
@@ -19,8 +19,8 @@ pub struct FlashCard {
     pub topic: Option<String>,
     pub tags: Option<Vec<String>>,
     pub difficulty: Option<i32>,
-    pub created_at: Timestamp,
-    pub updated_at: Timestamp,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
 }
 
 // implement the TryFrom trait, which aids in converting new data into the domain data model
@@ -49,14 +49,14 @@ impl TryFrom<NewFlashCard> for FlashCard {
             topic: new.topic.map(|s| s.trim().to_string()),
             tags: new.tags,
             difficulty: new.difficulty,
-            created_at: Timestamp::now(),
-            updated_at: Timestamp::now(),
+            created_at: Utc::now(),
+            updated_at: Utc::now(),
         })
     }
 }
 
 // struct type to represent a new flash card, coming in as an input
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Default, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct NewFlashCard {
     pub question: String,

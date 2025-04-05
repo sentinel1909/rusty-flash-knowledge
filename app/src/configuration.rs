@@ -5,13 +5,13 @@ use pavex::time::SignedDuration;
 use secrecy::{ExposeSecret, SecretString};
 use serde::Deserialize;
 use serde_aux::field_attributes::deserialize_number_from_string;
-use sqlx::postgres::{PgPool, PgConnectOptions, PgSslMode};
+use sqlx::postgres::{PgConnectOptions, PgPool, PgSslMode};
 
 /// Refer to Pavex's [configuration guide](https://pavex.dev/docs/guide/configuration) for more details
 /// on how to manage configuration values.
 pub fn register(bp: &mut Blueprint) {
     bp.config("server", t!(self::ServerConfig));
-    bp.config("database", t!(self::DatabbaseConfig));
+    bp.config("database", t!(self::DatabaseConfig));
 }
 
 #[derive(serde::Deserialize, Debug, Clone)]
@@ -63,7 +63,7 @@ impl ServerConfig {
 
 // struct type to represent the database configuration
 #[derive(Clone, Debug, Deserialize)]
-pub struct DatabbaseConfig {
+pub struct DatabaseConfig {
     pub username: String,
     pub password: SecretString,
     #[serde(deserialize_with = "deserialize_number_from_string")]
@@ -74,11 +74,11 @@ pub struct DatabbaseConfig {
 }
 
 // methods for the database configuration type
-impl DatabbaseConfig {
+impl DatabaseConfig {
     pub fn connection_options(&self) -> PgConnectOptions {
         let ssl_mode = if self.require_ssl {
             PgSslMode::Require
-        } else  {
+        } else {
             PgSslMode::Prefer
         };
         PgConnectOptions::new()
