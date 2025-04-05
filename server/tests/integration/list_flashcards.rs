@@ -1,7 +1,9 @@
 use crate::helpers::TestApi;
 use app::models::FlashCard;
-use chrono::Utc;
+use app::routes::flashcards::FlashCardResponse;
+use jiff_sqlx::ToSqlx;
 use pavex::http::StatusCode;
+use pavex::time::Timestamp as PavexTimestamp;
 use uuid::Uuid;
 
 #[tokio::test]
@@ -9,13 +11,13 @@ async fn list_flashcards_works() {
     // Arrange
     let flash_card = FlashCard {
         id: Uuid::new_v4(),
-        question: "Test Question".to_string(),
+        question: "test question".to_string(),
         answer: "test answer".to_string(),
-        topic: Some("lifetimes".to_string()),
+        topic: Some("test topic".to_string()),
         tags: Some(vec!["tag1".to_string(), "tag2".to_string()]),
-        difficulty: Some(4),
-        created_at: Utc::now(),
-        updated_at: Utc::now(),
+        difficulty: Some(1),
+        created_at: PavexTimestamp::now().to_sqlx(),
+        updated_at: PavexTimestamp::now().to_sqlx(),
     };
 
     let api = TestApi::spawn().await;
@@ -39,14 +41,8 @@ async fn list_flashcards_works() {
     // Assert
     assert_eq!(response.status(), StatusCode::OK);
 
-    let response_body: Vec<FlashCard> = response.json().await.unwrap();
-    let expected_body = vec![flash_card];
+    let response_body: Vec<FlashCardResponse> = response.json().await.unwrap();
 
-    assert_eq!(response_body, expected_body);
-
-    // Clean up
-    sqlx::query("TRUNCATE flashcards")
-        .execute(&api.db_pool)
-        .await
-        .unwrap();
+    let expected_response = FlashCardResponse::from(flash_card);
+    assert_eq!(response_body, vec![expected_response]);
 }

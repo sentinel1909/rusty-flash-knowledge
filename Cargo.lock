@@ -104,7 +104,7 @@ checksum = "dcfed56ad506cb2c684a14971b8861fdc3baaaae314b9e5f9bb532cbe3ba7a4f"
 
 [[package]]
 name = "app"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "cargo_px_env",
  "humantime-serde",
@@ -287,10 +287,7 @@ checksum = "1a7964611d71df112cb1730f2ee67324fcf4d0fc6606acbbe9bfe06df124637c"
 dependencies = [
  "android-tzdata",
  "iana-time-zone",
- "js-sys",
  "num-traits",
- "serde",
- "wasm-bindgen",
  "windows-link",
 ]
 
@@ -2271,12 +2268,12 @@ dependencies = [
 
 [[package]]
 name = "server"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "anyhow",
  "app",
- "chrono",
  "dotenvy",
+ "jiff-sqlx",
  "pavex",
  "reqwest",
  "server_sdk",

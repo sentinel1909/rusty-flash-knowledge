@@ -33,7 +33,7 @@ app = { path = "../app" }
 workspace_hack = { path = "../workspace_hack" }
 
 [dev-dependencies]
-chrono = { version = "0.4.40", features = [ "serde" ] }
+jiff-sqlx = { version = "0.1.1", features = ["postgres"] }
 reqwest = "0.12"
 sqlx = { version = "0.8.3", features = [ "runtime-tokio", "tls-rustls", "migrate", "uuid", "macros", "chrono", "postgres" ] }
 uuid = { version = "1.16.0", features = ["v4", "serde" ] }
