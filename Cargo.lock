@@ -107,8 +107,8 @@ name = "app"
 version = "0.4.0"
 dependencies = [
  "cargo_px_env",
- "chrono",
  "humantime-serde",
+ "jiff-sqlx",
  "pavex",
  "pavex_cli_client",
  "pavex_tracing",
@@ -116,7 +116,6 @@ dependencies = [
  "serde",
  "serde-aux",
  "sqlx",
- "time",
  "tracing",
  "tracing_log_error",
  "uuid",
@@ -1152,6 +1151,17 @@ dependencies = [
  "portable-atomic-util",
  "serde",
  "windows-sys 0.59.0",
+]
+
+[[package]]
+name = "jiff-sqlx"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cad0aaf716e798876e02217ae420bd730370a175ffd59870018c4aa4daa1513e"
+dependencies = [
+ "jiff",
+ "sqlx-core",
+ "sqlx-postgres",
 ]
 
 [[package]]
@@ -2441,6 +2451,7 @@ dependencies = [
  "sha2",
  "smallvec",
  "thiserror",
+ "time",
  "tokio",
  "tokio-stream",
  "tracing",
@@ -2527,6 +2538,7 @@ dependencies = [
  "sqlx-core",
  "stringprep",
  "thiserror",
+ "time",
  "tracing",
  "uuid",
  "whoami",
@@ -2566,6 +2578,7 @@ dependencies = [
  "sqlx-core",
  "stringprep",
  "thiserror",
+ "time",
  "tracing",
  "uuid",
  "whoami",
@@ -2591,6 +2604,7 @@ dependencies = [
  "serde",
  "serde_urlencoded",
  "sqlx-core",
+ "time",
  "tracing",
  "url",
  "uuid",

@@ -21,19 +21,24 @@ unexpected_cfgs = { level = "allow", check-cfg = ['cfg(pavex_ide_hint)'] }
 
 [dependencies]
 cargo_px_env = "0.1"
-chrono = { version = "0.4.40", features = [ "serde" ] }
 humantime-serde = "1.1"
+jiff-sqlx = { version = "0.1.1", features = ["postgres"] }
 pavex = { version = "0.1.80" }
 pavex_tracing = { version = "0.1.80" }
 pavex_cli_client = { version = "0.1.80" }
 tracing = "0.1"
 tracing_log_error = "0.1"
-secrecy = { version = "0.10.3", features = [ "serde" ] }
+secrecy = { version = "0.10.3", features = ["serde"] }
 serde = { version = "1", features = ["derive"] }
 serde-aux = "4"
-sqlx = { version = "0.8.3", features = [ "runtime-tokio", "tls-rustls", "migrate", "uuid", "macros", "chrono", "postgres" ] }
-uuid = { version = "1.16.0", features = ["v4", "serde" ] }
+sqlx = { version = "0.8.3", features = [
+    "runtime-tokio",
+    "tls-rustls",
+    "migrate",
+    "uuid",
+    "macros",
+    "time",
+    "postgres",
+] }
+uuid = { version = "1.16.0", features = ["v4", "serde"] }
 workspace_hack = { path = "../workspace_hack" }
-time = "0.3.41"
-
-
