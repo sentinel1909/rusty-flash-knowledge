@@ -5,13 +5,12 @@
 // dependencies
 use crate::errors::FlashcardValidationError;
 use chrono::{DateTime, Utc};
-use pavex::time::Timestamp;
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use uuid::Uuid;
 
 // struct type to represent a flash card
-#[derive(Debug, Deserialize, Serialize, FromRow, PartialEq)]
+#[derive(Debug, Deserialize, Eq, Serialize, FromRow, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct FlashCard {
     pub id: Uuid,

@@ -2265,17 +2265,19 @@ version = "0.3.0"
 dependencies = [
  "anyhow",
  "app",
+ "chrono",
  "dotenvy",
  "pavex",
  "reqwest",
- "serde_json",
  "server_sdk",
+ "sqlx",
  "tokio",
  "tracing",
  "tracing-bunyan-formatter",
  "tracing-panic",
  "tracing-subscriber",
  "tracing_log_error",
+ "uuid",
  "workspace_hack",
 ]
 
