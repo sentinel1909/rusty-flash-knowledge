@@ -31,7 +31,7 @@ async fn list_flashcards_works() {
         .bind(flash_card.difficulty)
         .bind(flash_card.created_at)
         .bind(flash_card.updated_at)
-        .execute(&api.db_pool)
+        .execute(&api.api_db_pool)
         .await
         .unwrap();
 

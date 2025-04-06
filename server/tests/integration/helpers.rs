@@ -1,21 +1,47 @@
 use pavex::{config::ConfigLoader, http::HeaderValue, server::Server};
 use server::configuration::Profile;
 use server_sdk::{ApplicationConfig, ApplicationState, run};
-use sqlx::PgPool;
+use sqlx::{Connection, Executor, PgConnection, PgPool};
 use std::sync::Once;
 use tracing::subscriber::set_global_default;
 use tracing_subscriber::EnvFilter;
+use uuid::Uuid;
+
+// helper function to configure an independent database for each test, so that teste are isolated
+async fn configure_database(config: &ApplicationConfig) -> PgPool {
+    let mut connection = PgConnection::connect_with(&config.database.without_db())
+        .await
+        .expect("Failed to connect to Postgres");
+
+    connection
+        .execute(format!(r#"CREATE DATABASE "{}";"#, config.database.database_name).as_str())
+        .await
+        .expect("Failed to create database.");
+
+    let connection_pool = PgPool::connect_with(config.database.with_db())
+        .await
+        .expect("Failed to connect to Postgres.");
+
+    sqlx::migrate!("../migrations")
+        .run(&connection_pool)
+        .await
+        .expect("Failed to migrate the database.");
+
+    connection_pool
+}
 
 pub struct TestApi {
     pub api_address: String,
     pub api_client: reqwest::Client,
-    pub db_pool: PgPool,
+    pub api_db_pool: PgPool,
 }
 
 impl TestApi {
     pub async fn spawn() -> Self {
         Self::init_telemetry();
-        let config = Self::get_config();
+        let mut config = Self::get_config();
+        config.database.database_name = Uuid::new_v4().to_string();
+        configure_database(&config).await;
         let tcp_listener = config
             .server
             .listener()
@@ -26,7 +52,8 @@ impl TestApi {
             .expect("The server TCP listener doesn't have a local socket address");
         let server_builder = Server::new().listen(tcp_listener);
         let api_address = format!("http://{}:{}", config.server.ip, address.port());
-        let db = config.database.get_pool().await.unwrap();
+        let api_client = reqwest::Client::new();
+        let api_db_pool = config.database.get_pool().await;
 
         let application_state = ApplicationState::new(config)
             .await
@@ -36,8 +63,8 @@ impl TestApi {
 
         TestApi {
             api_address,
-            api_client: reqwest::Client::new(),
-            db_pool: db,
+            api_client,
+            api_db_pool,
         }
     }
 

@@ -104,7 +104,7 @@ checksum = "dcfed56ad506cb2c684a14971b8861fdc3baaaae314b9e5f9bb532cbe3ba7a4f"
 
 [[package]]
 name = "app"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "cargo_px_env",
  "humantime-serde",
@@ -117,6 +117,7 @@ dependencies = [
  "serde-aux",
  "sqlx",
  "tracing",
+ "tracing-log 0.2.0",
  "tracing_log_error",
  "uuid",
  "workspace_hack",
@@ -2268,7 +2269,7 @@ dependencies = [
 
 [[package]]
 name = "server"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "anyhow",
  "app",

@@ -37,7 +37,7 @@ impl From<FlashCard> for FlashCardResponse {
 
 // handler which lists all the flash cards in the database
 pub async fn list_flashcards_handler(db: &DatabaseConfig) -> Response {
-    let pool = db.get_pool().await.unwrap();
+    let pool = db.get_pool().await;
     let flash_cards = list_flashcards(pool).await;
     let response_body: Vec<FlashCardResponse> = flash_cards.into_iter().map(Into::into).collect();
     let json = Json::new(response_body).expect("Unable to serialize response body.");

@@ -5,7 +5,8 @@ use pavex::time::SignedDuration;
 use secrecy::{ExposeSecret, SecretString};
 use serde::Deserialize;
 use serde_aux::field_attributes::deserialize_number_from_string;
-use sqlx::postgres::{PgConnectOptions, PgPool, PgSslMode};
+use sqlx::ConnectOptions;
+use sqlx::postgres::{PgConnectOptions, PgPool, PgPoolOptions, PgSslMode};
 
 /// Refer to Pavex's [configuration guide](https://pavex.dev/docs/guide/configuration) for more details
 /// on how to manage configuration values.
@@ -75,7 +76,16 @@ pub struct DatabaseConfig {
 
 // methods for the database configuration type
 impl DatabaseConfig {
-    pub fn connection_options(&self) -> PgConnectOptions {
+    pub fn with_db(&self) -> PgConnectOptions {
+        let options = self.without_db().database(&self.database_name);
+        options
+            .clone()
+            .log_statements(tracing_log::log::LevelFilter::Trace);
+
+        options
+    }
+
+    pub fn without_db(&self) -> PgConnectOptions {
         let ssl_mode = if self.require_ssl {
             PgSslMode::Require
         } else {
@@ -85,13 +95,12 @@ impl DatabaseConfig {
             .host(&self.host)
             .username(&self.username)
             .password(self.password.expose_secret())
-            .port(self.port)
             .ssl_mode(ssl_mode)
-            .database(&self.database_name)
     }
 
-    pub async fn get_pool(&self) -> Result<PgPool, sqlx::Error> {
-        let pool = PgPool::connect_with(self.connection_options()).await?;
-        Ok(pool)
+    pub async fn get_pool(&self) -> PgPool {
+        PgPoolOptions::new()
+            .acquire_timeout(std::time::Duration::from_secs(2))
+            .connect_lazy_with(self.with_db())
     }
 }
