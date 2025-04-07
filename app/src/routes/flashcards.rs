@@ -3,7 +3,7 @@
 // dependencies
 use crate::configuration::DatabaseConfig;
 use crate::models::{FlashCard, NewFlashCard};
-use crate::queries::{create_flashcard, list_flashcards};
+use crate::queries::{create_flashcard, delete_flashcard, list_flashcards};
 use pavex::request::body::JsonBody;
 use pavex::request::path::PathParams;
 use pavex::response::{Response, body::Json};
@@ -13,7 +13,7 @@ use uuid::Uuid;
 // struct type to represent the path parameters of an incoming request
 #[PathParams]
 pub struct FlashCardParams {
-    pub id: u64,
+    pub id: Uuid,
 }
 
 // struct type to represent a flash card as a response body
@@ -75,9 +75,11 @@ pub async fn update_flashcard(
 }
 
 // handler which deletes a flash card from the database, given an id
-pub async fn delete_flashcard(
+pub async fn delete_flashcard_handler(
     db: &DatabaseConfig,
     params: &PathParams<FlashCardParams>,
 ) -> Response {
-    todo!()
+    let pool = db.get_pool().await;
+    delete_flashcard(pool, params.0.id.clone()).await;
+    Response::no_content()
 }
