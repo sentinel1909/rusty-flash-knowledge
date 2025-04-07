@@ -3,6 +3,7 @@
 // dependencies
 use crate::models::FlashCard;
 use sqlx::PgPool;
+use uuid::Uuid;
 
 // function which queries the database and returns all the flash cards
 pub async fn list_flashcards(pool: PgPool) -> Vec<FlashCard> {
@@ -32,4 +33,13 @@ pub async fn create_flashcard(pool: PgPool, new_card: FlashCard) -> FlashCard {
             .unwrap();
 
     new_flash_card
+}
+
+// function which queries the database, given a flash card id, and deletes that entry
+pub async fn delete_flashcard(pool: PgPool, id: Uuid) {
+    sqlx::query("DELETE FROM flashcards WHERE id = $1;")
+        .bind(id)
+        .execute(&pool)
+        .await
+        .unwrap();
 }

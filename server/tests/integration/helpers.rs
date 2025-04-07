@@ -140,4 +140,16 @@ impl TestApi {
             .await
             .expect("Failed to execute request.")
     }
+
+    pub async fn delete_flashcard(&self, id: String) -> reqwest::Response {
+        self.api_client
+            .delete(format!("{}/v1/flashcards/{}", &self.api_address, id))
+            .header(
+                reqwest::header::HOST,
+                HeaderValue::from_static("api.rusty-flash-knowledge.net"),
+            )
+            .send()
+            .await
+            .expect("Failed to execute request.")
+    }
 }

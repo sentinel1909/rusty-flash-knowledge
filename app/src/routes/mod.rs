@@ -29,7 +29,7 @@ fn api_bp() -> Blueprint {
     bp.route(
         DELETE,
         "/flashcards/{id}",
-        f!(self::flashcards::delete_flashcard),
+        f!(self::flashcards::delete_flashcard_handler),
     );
     bp
 }
