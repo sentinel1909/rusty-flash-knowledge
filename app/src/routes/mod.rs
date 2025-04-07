@@ -16,7 +16,11 @@ fn api_bp() -> Blueprint {
         f!(self::flashcards::list_flashcards_handler),
     );
     bp.route(GET, "/flashcards/{id}", f!(self::flashcards::get_flashcard));
-    bp.route(POST, "/flashcards", f!(self::flashcards::create_flashcard));
+    bp.route(
+        POST,
+        "/flashcards",
+        f!(self::flashcards::create_flashcard_handler),
+    );
     bp.route(
         PUT,
         "/flashcards/{id}",

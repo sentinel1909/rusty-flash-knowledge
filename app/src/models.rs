@@ -6,12 +6,12 @@
 use crate::errors::FlashcardValidationError;
 use jiff_sqlx::{Timestamp as SqlxTimestamp, ToSqlx};
 use pavex::time::Timestamp as PavexTimestamp;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use uuid::Uuid;
 
 // struct type to represent a flash card
-#[derive(Debug, Eq, FromRow, PartialEq)]
+#[derive(Clone, Debug, Eq, FromRow, PartialEq)]
 pub struct FlashCard {
     pub id: Uuid,
     pub question: String,
@@ -58,7 +58,7 @@ impl TryFrom<NewFlashCard> for FlashCard {
 }
 
 // struct type to represent a new flash card, coming in as an input
-#[derive(Debug, Default, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct NewFlashCard {
     pub question: String,
