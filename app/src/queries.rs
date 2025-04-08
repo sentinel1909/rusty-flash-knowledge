@@ -18,6 +18,17 @@ pub async fn list_flashcards(pool: PgPool) -> Vec<FlashCard> {
     flash_cards
 }
 
+// function which queries the database and returns a single flash card give an id
+pub async fn list_flashcard(pool: PgPool, id: Uuid) -> FlashCard {
+    let flash_card = sqlx::query_as("SELECT * FROM flashcards WHERE id = $1;")
+        .bind(id)
+        .fetch_one(&pool)
+        .await
+        .unwrap();
+
+    flash_card
+}
+
 // function which queries the database and returns all the flash cards
 pub async fn create_flashcard(pool: PgPool, new_card: FlashCard) -> FlashCard {
     let new_flash_card: FlashCard =

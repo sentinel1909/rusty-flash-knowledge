@@ -680,7 +680,7 @@ pub mod route_3 {
                 };
             }
         };
-        let v5 = app::routes::flashcards::get_flashcard(v2, &v4).await;
+        let v5 = app::routes::flashcards::list_flashcard_handler(v2, &v4).await;
         <pavex::response::Response as pavex::response::IntoResponse>::into_response(v5)
     }
     async fn post_processing_0(
