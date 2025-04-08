@@ -128,6 +128,18 @@ impl TestApi {
             .expect("Failed to execute request.")
     }
 
+    pub async fn get_flashcard(&self, id: String) -> reqwest::Response {
+        self.api_client
+            .get(format!("{}/v1/flashcards/{}", &self.api_address, id))
+            .header(
+                reqwest::header::HOST,
+                HeaderValue::from_static("api.rusty-flash-knowledge.net"),
+            )
+            .send()
+            .await
+            .expect("Failed to execute request.")
+    }
+
     pub async fn create_flashcard(&self, payload: &NewFlashCard) -> reqwest::Response {
         self.api_client
             .post(format!("{}/v1/flashcards", &self.api_address))

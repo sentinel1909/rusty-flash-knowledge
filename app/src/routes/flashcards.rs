@@ -3,7 +3,9 @@
 // dependencies
 use crate::configuration::DatabaseConfig;
 use crate::models::{FlashCard, NewFlashCard, UpdatedFlashCard};
-use crate::queries::{create_flashcard, delete_flashcard, list_flashcards, update_flashcard};
+use crate::queries::{
+    create_flashcard, delete_flashcard, list_flashcard, list_flashcards, update_flashcard,
+};
 use pavex::request::body::JsonBody;
 use pavex::request::path::PathParams;
 use pavex::response::{Response, body::Json};
@@ -48,8 +50,15 @@ pub async fn list_flashcards_handler(db: &DatabaseConfig) -> Response {
 }
 
 // handler which retrieves a flash card by id from the database
-pub async fn get_flashcard(db: &DatabaseConfig, params: &PathParams<FlashCardParams>) -> Response {
-    todo!()
+pub async fn list_flashcard_handler(
+    db: &DatabaseConfig,
+    params: &PathParams<FlashCardParams>,
+) -> Response {
+    let pool = db.get_pool().await;
+    let flash_card = list_flashcard(pool, params.0.id.clone()).await;
+    let response_body: FlashCardResponse = FlashCardResponse::from(flash_card);
+    let json = Json::new(response_body).expect("Unable to serialize response body.");
+    Response::ok().set_typed_body(json)
 }
 
 // handler which creates a new flash card in the database
