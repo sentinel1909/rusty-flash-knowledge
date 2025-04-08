@@ -16,11 +16,11 @@ pub struct FlashCard {
     pub id: Uuid,
     pub question: String,
     pub answer: String,
-    pub topic: Option<String>,
-    pub tags: Option<Vec<String>>,
-    pub difficulty: Option<i32>,
+    pub topic: String,
+    pub tags: Vec<String>,
+    pub difficulty: i32,
     pub created_at: SqlxTimestamp,
-    pub updated_at: SqlxTimestamp,
+    pub updated_at: Option<SqlxTimestamp>,
 }
 
 // implement the TryFrom trait, which aids in converting new data into the domain data model
@@ -36,10 +36,16 @@ impl TryFrom<NewFlashCard> for FlashCard {
             return Err(FlashcardValidationError::EmptyAnswer);
         }
 
-        if let Some(d) = new.difficulty {
-            if !(1..=5).contains(&d) {
-                return Err(FlashcardValidationError::InvalidDifficulty(d));
-            }
+        if new.topic.trim().is_empty() {
+            return Err(FlashcardValidationError::EmptyTopic);
+        }
+
+        if new.tags.len() == 0 {
+            return Err(FlashcardValidationError::EmptyTags);
+        }
+
+        if new.difficulty < 1 || new.difficulty > 5 {
+            return Err(FlashcardValidationError::InvalidDifficulty);
         }
 
         let now = PavexTimestamp::now().to_sqlx();
@@ -48,11 +54,11 @@ impl TryFrom<NewFlashCard> for FlashCard {
             id: Uuid::new_v4(),
             question: new.question.trim().to_string(),
             answer: new.answer.trim().to_string(),
-            topic: new.topic.map(|s| s.trim().to_string()),
+            topic: new.topic.trim().to_string(),
             tags: new.tags,
             difficulty: new.difficulty,
             created_at: now,
-            updated_at: now,
+            updated_at: None,
         })
     }
 }
@@ -63,6 +69,17 @@ impl TryFrom<NewFlashCard> for FlashCard {
 pub struct NewFlashCard {
     pub question: String,
     pub answer: String,
+    pub topic: String,
+    pub tags: Vec<String>,
+    pub difficulty: i32,
+}
+
+// struct type to represent an updated flash card, coming in as input
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdatedFlashCard {
+    pub question: Option<String>,
+    pub answer: Option<String>,
     pub topic: Option<String>,
     pub tags: Option<Vec<String>>,
     pub difficulty: Option<i32>,
@@ -78,9 +95,9 @@ mod tests {
         let new = NewFlashCard {
             question: "What is Rust?".to_string(),
             answer: "A systems programming language.".to_string(),
-            topic: Some("intro".to_string()),
-            tags: Some(vec!["memory-safe".to_string(), "fast".to_string()]),
-            difficulty: Some(3),
+            topic: "intro".to_string(),
+            tags: vec!["memory-safe".to_string(), "fast".to_string()],
+            difficulty: 3,
         };
 
         let result = FlashCard::try_from(new);
@@ -88,17 +105,20 @@ mod tests {
         assert!(result.is_ok());
         let card = result.unwrap();
         assert_eq!(card.question, "What is Rust?");
-        assert_eq!(card.difficulty, Some(3));
+        assert_eq!(card.answer, "A systems programming language.");
+        assert_eq!(card.topic, "intro");
+        assert!(!card.tags.is_empty());
+        assert_eq!(card.difficulty, 3);
     }
 
     #[test]
     fn empty_question_is_invalid() {
         let new = NewFlashCard {
             question: "   ".to_string(),
-            answer: "Valid answer".to_string(),
-            topic: None,
-            tags: None,
-            difficulty: Some(2),
+            answer: "valid answer".to_string(),
+            topic: "valid topic".to_string(),
+            tags: vec!["valid tag".to_string()],
+            difficulty: 1,
         };
 
         let result = FlashCard::try_from(new);
@@ -110,9 +130,9 @@ mod tests {
         let new = NewFlashCard {
             question: "Valid question".to_string(),
             answer: "".to_string(),
-            topic: None,
-            tags: None,
-            difficulty: Some(2),
+            topic: "valid topic".to_string(),
+            tags: vec!["valid tag".to_string()],
+            difficulty: 1,
         };
 
         let result = FlashCard::try_from(new);
@@ -120,16 +140,44 @@ mod tests {
     }
 
     #[test]
+    fn empty_topic_is_invalid() {
+        let new = NewFlashCard {
+            question: "valid question".to_string(),
+            answer: "valid answer".to_string(),
+            topic: "".to_string(),
+            tags: vec!["valid tag".to_string()],
+            difficulty: 1,
+        };
+
+        let result = FlashCard::try_from(new);
+        assert_eq!(result, Err(FlashcardValidationError::EmptyTopic));
+    }
+
+    #[test]
+    fn empty_tags_are_invalid() {
+        let new = NewFlashCard {
+            question: "valid question".to_string(),
+            answer: "valid answer".to_string(),
+            topic: "valid topic".to_string(),
+            tags: vec![],
+            difficulty: 1,
+        };
+
+        let result = FlashCard::try_from(new);
+        assert_eq!(result, Err(FlashcardValidationError::EmptyTags));
+    }
+
+    #[test]
     fn difficulty_out_of_bounds_is_invalid() {
         let new = NewFlashCard {
             question: "Valid question".to_string(),
             answer: "Valid answer".to_string(),
-            topic: None,
-            tags: None,
-            difficulty: Some(99),
+            topic: "valid topic".to_string(),
+            tags: vec!["valid tag".to_string()],
+            difficulty: 99,
         };
 
         let result = FlashCard::try_from(new);
-        assert_eq!(result, Err(FlashcardValidationError::InvalidDifficulty(99)));
+        assert_eq!(result, Err(FlashcardValidationError::InvalidDifficulty));
     }
 }

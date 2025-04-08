@@ -13,9 +13,9 @@ async fn delete_flashcard_works() {
     let new_flash_card = NewFlashCard {
         question: "test question".to_string(),
         answer: "test answer".to_string(),
-        topic: Some("test topic".to_string()),
-        tags: Some(vec!["tag1".to_string()]),
-        difficulty: Some(1),
+        topic: "test topic".to_string(),
+        tags: vec!["tag1".to_string()],
+        difficulty: 1,
     };
 
     let flash_card = FlashCard::try_from(new_flash_card).unwrap();

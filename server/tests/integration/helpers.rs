@@ -1,4 +1,4 @@
-use app::models::NewFlashCard;
+use app::{UpdatedFlashCard, models::NewFlashCard};
 use pavex::{config::ConfigLoader, http::HeaderValue, server::Server};
 use server::configuration::Profile;
 use server_sdk::{ApplicationConfig, ApplicationState, run};
@@ -148,6 +148,23 @@ impl TestApi {
                 reqwest::header::HOST,
                 HeaderValue::from_static("api.rusty-flash-knowledge.net"),
             )
+            .send()
+            .await
+            .expect("Failed to execute request.")
+    }
+
+    pub async fn update_flashcard(
+        &self,
+        payload: &UpdatedFlashCard,
+        id: String,
+    ) -> reqwest::Response {
+        self.api_client
+            .put(format!("{}/v1/flashcards/{}", &self.api_address, id))
+            .header(
+                reqwest::header::HOST,
+                HeaderValue::from_static("api.rusty-flash-knowledge.net"),
+            )
+            .json(&payload)
             .send()
             .await
             .expect("Failed to execute request.")

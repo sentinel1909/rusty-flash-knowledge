@@ -5,7 +5,9 @@
 pub enum FlashcardValidationError {
     EmptyQuestion,
     EmptyAnswer,
-    InvalidDifficulty(i32),
+    EmptyTopic,
+    EmptyTags,
+    InvalidDifficulty,
 }
 
 // implement the Error trait for the FlashcardValidationError type
@@ -17,7 +19,12 @@ impl std::fmt::Display for FlashcardValidationError {
         match self {
             Self::EmptyQuestion => write!(f, "Question field cannot be empty."),
             Self::EmptyAnswer => write!(f, "Answer field cannot be empty."),
-            Self::InvalidDifficulty(d) => write!(f, "Invalid difficulty level: {}", d),
+            Self::EmptyTopic => write!(f, "Topic field cannot be empty."),
+            Self::EmptyTags => write!(f, "Tags field cannot be empty."),
+            Self::InvalidDifficulty => write!(
+                f,
+                "Invalid difficulty level. Difficulty must be between 1 and 5"
+            ),
         }
     }
 }
