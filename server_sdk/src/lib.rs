@@ -1034,7 +1034,7 @@ pub mod route_5 {
                 };
             }
         };
-        let v12 = app::routes::flashcards::update_flashcard(v4, &v9, &v11).await;
+        let v12 = app::routes::flashcards::update_flashcard_handler(v4, &v9, &v11).await;
         <pavex::response::Response as pavex::response::IntoResponse>::into_response(v12)
     }
     async fn post_processing_0(

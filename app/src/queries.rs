@@ -1,7 +1,9 @@
 // app/src/queries.rs
 
 // dependencies
-use crate::models::FlashCard;
+use crate::{UpdatedFlashCard, models::FlashCard};
+use jiff_sqlx::ToSqlx;
+use pavex::time::Timestamp as PavexTimestamp;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -42,4 +44,21 @@ pub async fn delete_flashcard(pool: PgPool, id: Uuid) {
         .execute(&pool)
         .await
         .unwrap();
+}
+
+// function which queries the database, given a flashcard id, and updates that entry
+pub async fn update_flashcard(pool: PgPool, id: Uuid, updated_card: UpdatedFlashCard) -> FlashCard {
+    let updated_flash_card: FlashCard = sqlx::query_as("UPDATE flashcards SET question = $1, answer = $2, topic = $3, tags = $4, difficulty = $5, updated_at = $6 WHERE id = $7 RETURNING *;")
+        .bind(updated_card.question)
+        .bind(updated_card.answer)
+        .bind(updated_card.topic)
+        .bind(updated_card.tags)
+        .bind(updated_card.difficulty)
+        .bind(Some(PavexTimestamp::now().to_sqlx()))
+        .bind(id)
+        .fetch_one(&pool)
+        .await
+        .unwrap();
+
+    updated_flash_card
 }

@@ -9,15 +9,14 @@ use pavex::http::StatusCode;
 #[tokio::test]
 async fn create_flashcard_works() {
     // Arrange
+    let api = TestApi::spawn().await;
     let new_flash_card = NewFlashCard {
         question: "new test question".to_string(),
         answer: "new test answer".to_string(),
-        topic: Some("new test topic".to_string()),
-        tags: Some(vec!["newtag1".to_string(), "newtag2".to_string()]),
-        difficulty: Some(1),
+        topic: "new test topic".to_string(),
+        tags: vec!["newtag1".to_string(), "newtag2".to_string()],
+        difficulty: 1,
     };
-
-    let api = TestApi::spawn().await;
 
     // Act
     let response = api.create_flashcard(&new_flash_card).await;

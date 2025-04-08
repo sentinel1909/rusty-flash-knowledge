@@ -9,18 +9,17 @@ use uuid::Uuid;
 #[tokio::test]
 async fn list_flashcards_works() {
     // Arrange
+    let api = TestApi::spawn().await;
     let flash_card = FlashCard {
         id: Uuid::new_v4(),
         question: "test question".to_string(),
         answer: "test answer".to_string(),
-        topic: Some("test topic".to_string()),
-        tags: Some(vec!["tag1".to_string(), "tag2".to_string()]),
-        difficulty: Some(1),
+        topic: "test topic".to_string(),
+        tags: vec!["tag1".to_string(), "tag2".to_string()],
+        difficulty: 1,
         created_at: PavexTimestamp::now().to_sqlx(),
-        updated_at: PavexTimestamp::now().to_sqlx(),
+        updated_at: None,
     };
-
-    let api = TestApi::spawn().await;
 
     sqlx::query("INSERT INTO flashcards (id, question, answer, topic, tags, difficulty, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)")
         .bind(flash_card.id)
