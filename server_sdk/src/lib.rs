@@ -501,7 +501,7 @@ pub mod route_2 {
         s_0: &'a pavex_tracing::RootSpan,
         s_1: &'b app::configuration::DatabaseConfig,
     ) -> pavex::response::Response {
-        let response = handler(s_1).await;
+        let response = handler(s_0, s_1).await;
         let response = post_processing_0(response, s_0).await;
         response
     }
@@ -538,10 +538,24 @@ pub mod route_2 {
         <pavex::response::Response as pavex::response::IntoResponse>::into_response(v8)
     }
     async fn handler(
-        v0: &app::configuration::DatabaseConfig,
+        v0: &pavex_tracing::RootSpan,
+        v1: &app::configuration::DatabaseConfig,
     ) -> pavex::response::Response {
-        let v1 = app::routes::flashcards::list_flashcards_handler(v0).await;
-        <pavex::response::Response as pavex::response::IntoResponse>::into_response(v1)
+        let v2 = app::routes::flashcards::list_flashcards_handler(v1).await;
+        let v3 = match v2 {
+            Ok(ok) => ok,
+            Err(v3) => {
+                return {
+                    let v4 = app::api_error2response(&v3);
+                    let v5 = pavex::Error::new(v3);
+                    app::telemetry::error_logger(&v5, v0).await;
+                    <http::StatusCode as pavex::response::IntoResponse>::into_response(
+                        v4,
+                    )
+                };
+            }
+        };
+        <pavex::response::Response as pavex::response::IntoResponse>::into_response(v3)
     }
     async fn post_processing_0(
         v0: pavex::response::Response,
@@ -681,7 +695,20 @@ pub mod route_3 {
             }
         };
         let v5 = app::routes::flashcards::list_flashcard_handler(v2, &v4).await;
-        <pavex::response::Response as pavex::response::IntoResponse>::into_response(v5)
+        let v6 = match v5 {
+            Ok(ok) => ok,
+            Err(v6) => {
+                return {
+                    let v7 = app::api_error2response(&v6);
+                    let v8 = pavex::Error::new(v6);
+                    app::telemetry::error_logger(&v8, v0).await;
+                    <http::StatusCode as pavex::response::IntoResponse>::into_response(
+                        v7,
+                    )
+                };
+            }
+        };
+        <pavex::response::Response as pavex::response::IntoResponse>::into_response(v6)
     }
     async fn post_processing_0(
         v0: pavex::response::Response,
@@ -845,7 +872,20 @@ pub mod route_4 {
             }
         };
         let v9 = app::routes::flashcards::create_flashcard_handler(v3, &v8).await;
-        <pavex::response::Response as pavex::response::IntoResponse>::into_response(v9)
+        let v10 = match v9 {
+            Ok(ok) => ok,
+            Err(v10) => {
+                return {
+                    let v11 = app::api_error2response(&v10);
+                    let v12 = pavex::Error::new(v10);
+                    app::telemetry::error_logger(&v12, v1).await;
+                    <http::StatusCode as pavex::response::IntoResponse>::into_response(
+                        v11,
+                    )
+                };
+            }
+        };
+        <pavex::response::Response as pavex::response::IntoResponse>::into_response(v10)
     }
     async fn post_processing_0(
         v0: pavex::response::Response,
@@ -1035,7 +1075,20 @@ pub mod route_5 {
             }
         };
         let v12 = app::routes::flashcards::update_flashcard_handler(v4, &v9, &v11).await;
-        <pavex::response::Response as pavex::response::IntoResponse>::into_response(v12)
+        let v13 = match v12 {
+            Ok(ok) => ok,
+            Err(v13) => {
+                return {
+                    let v14 = app::api_error2response(&v13);
+                    let v15 = pavex::Error::new(v13);
+                    app::telemetry::error_logger(&v15, v2).await;
+                    <http::StatusCode as pavex::response::IntoResponse>::into_response(
+                        v14,
+                    )
+                };
+            }
+        };
+        <pavex::response::Response as pavex::response::IntoResponse>::into_response(v13)
     }
     async fn post_processing_0(
         v0: pavex::response::Response,
@@ -1185,7 +1238,20 @@ pub mod route_6 {
             }
         };
         let v5 = app::routes::flashcards::delete_flashcard_handler(v2, &v4).await;
-        <pavex::response::Response as pavex::response::IntoResponse>::into_response(v5)
+        let v6 = match v5 {
+            Ok(ok) => ok,
+            Err(v6) => {
+                return {
+                    let v7 = app::api_error2response(&v6);
+                    let v8 = pavex::Error::new(v6);
+                    app::telemetry::error_logger(&v8, v0).await;
+                    <http::StatusCode as pavex::response::IntoResponse>::into_response(
+                        v7,
+                    )
+                };
+            }
+        };
+        <pavex::response::Response as pavex::response::IntoResponse>::into_response(v6)
     }
     async fn post_processing_0(
         v0: pavex::response::Response,
