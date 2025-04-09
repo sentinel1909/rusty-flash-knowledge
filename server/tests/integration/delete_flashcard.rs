@@ -2,23 +2,26 @@
 
 // dependencies
 use crate::helpers::TestApi;
-use app::models::{FlashCard, NewFlashCard};
+use app::models::FlashCard;
+use jiff_sqlx::ToSqlx;
 use pavex::http::StatusCode;
+use pavex::time::Timestamp as PavexTimestamp;
 use uuid::Uuid;
 
 #[tokio::test]
-async fn delete_flashcard_works() {
+async fn delete_flashcard_returns_no_content_when_successful() {
     // Arrange
     let api = TestApi::spawn().await;
-    let new_flash_card = NewFlashCard {
+    let flash_card = FlashCard {
+        id: Uuid::new_v4(),
         question: "test question".to_string(),
         answer: "test answer".to_string(),
         topic: "test topic".to_string(),
-        tags: vec!["tag1".to_string()],
+        tags: vec!["tag1".to_string(), "tag2".to_string()],
         difficulty: 1,
+        created_at: PavexTimestamp::now().to_sqlx(),
+        updated_at: None,
     };
-
-    let flash_card = FlashCard::try_from(new_flash_card).unwrap();
 
     let id: Uuid = sqlx::query_scalar("INSERT INTO flashcards (id, question, answer, topic, tags, difficulty, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id;")
         .bind(flash_card.id)

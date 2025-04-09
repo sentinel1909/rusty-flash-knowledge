@@ -14,27 +14,32 @@ fn api_bp() -> Blueprint {
         GET,
         "/flashcards",
         f!(self::flashcards::list_flashcards_handler),
-    );
+    )
+    .error_handler(f!(crate::errors::api_error2response));
     bp.route(
         GET,
         "/flashcards/{id}",
         f!(self::flashcards::list_flashcard_handler),
-    );
+    )
+    .error_handler(f!(crate::errors::api_error2response));
     bp.route(
         POST,
         "/flashcards",
         f!(self::flashcards::create_flashcard_handler),
-    );
+    )
+    .error_handler(f!(crate::errors::api_error2response));
     bp.route(
         PUT,
         "/flashcards/{id}",
         f!(self::flashcards::update_flashcard_handler),
-    );
+    )
+    .error_handler(f!(crate::errors::api_error2response));
     bp.route(
         DELETE,
         "/flashcards/{id}",
         f!(self::flashcards::delete_flashcard_handler),
-    );
+    )
+    .error_handler(f!(crate::errors::api_error2response));
     bp
 }
 
