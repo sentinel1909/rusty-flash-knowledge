@@ -45,3 +45,16 @@ async fn list_single_flashcard_works() {
     let expected_response = FlashCardResponse::from(flash_card);
     assert_eq!(response_body, expected_response);
 }
+
+#[tokio::test]
+async fn list_flashcard_returns_400_for_invalid_id() {
+    // Arrange
+    let api = TestApi::spawn().await;
+    let id = "the-wrong-card-id-value".to_string();
+
+    // Act
+    let response = api.get_flashcard(id).await;
+
+    // Assert
+    assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+}

@@ -16,7 +16,7 @@ use uuid::Uuid;
 // struct type to represent the path parameters of an incoming request
 #[PathParams]
 pub struct FlashCardParams {
-    pub id: Uuid,
+    pub id: String,
 }
 
 // struct type to represent a flash card as a response body
@@ -55,8 +55,12 @@ pub async fn list_flashcard_handler(
     db: &DatabaseConfig,
     params: &PathParams<FlashCardParams>,
 ) -> Result<Response, ApiError> {
+    let id = match Uuid::parse_str(&params.0.id) {
+        Ok(uuid) => uuid,
+        Err(e) => return Err(ApiError::UuidError(e)),
+    };
     let pool = db.get_pool().await;
-    let flash_card = list_flashcard(pool, params.0.id.clone()).await?;
+    let flash_card = list_flashcard(pool, id).await?;
     let response_body: FlashCardResponse = FlashCardResponse::from(flash_card);
     let json = Json::new(response_body)?;
     Ok(Response::ok().set_typed_body(json))
@@ -67,8 +71,9 @@ pub async fn create_flashcard_handler(
     db: &DatabaseConfig,
     body: &JsonBody<NewFlashCard>,
 ) -> Result<Response, ApiError> {
+    let body = body.0.clone();
     let pool = db.get_pool().await;
-    let new_flash_card = FlashCard::try_from(body.0.clone())?;
+    let new_flash_card = FlashCard::try_from(body)?;
     let created_flash_card = create_flashcard(pool, new_flash_card).await?;
     let response_body: FlashCardResponse = FlashCardResponse::from(created_flash_card);
     let json = Json::new(response_body)?;
@@ -81,8 +86,13 @@ pub async fn update_flashcard_handler(
     body: &JsonBody<UpdatedFlashCard>,
     params: &PathParams<FlashCardParams>,
 ) -> Result<Response, ApiError> {
+    let id = match Uuid::parse_str(&params.0.id) {
+        Ok(uuid) => uuid,
+        Err(e) => return Err(ApiError::UuidError(e)),
+    };
+    let body = body.0.clone();
     let pool = db.get_pool().await;
-    let updated_flash_card = update_flashcard(pool, params.0.id.clone(), body.0.clone()).await?;
+    let updated_flash_card = update_flashcard(pool, id, body).await?;
     let response_body: FlashCardResponse = FlashCardResponse::from(updated_flash_card);
     let json = Json::new(response_body)?;
     Ok(Response::ok().set_typed_body(json))
@@ -93,7 +103,11 @@ pub async fn delete_flashcard_handler(
     db: &DatabaseConfig,
     params: &PathParams<FlashCardParams>,
 ) -> Result<Response, ApiError> {
+    let id = match Uuid::parse_str(&params.0.id) {
+        Ok(uuid) => uuid,
+        Err(e) => return Err(ApiError::UuidError(e)),
+    };
     let pool = db.get_pool().await;
-    delete_flashcard(pool, params.0.id.clone()).await?;
+    delete_flashcard(pool, id).await?;
     Ok(Response::no_content())
 }

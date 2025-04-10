@@ -8,6 +8,7 @@ use pavex::{http::StatusCode, response::body::errors::JsonSerializationError};
 pub enum ApiError {
     ValidationError(FlashcardValidationError),
     SerializationError(JsonSerializationError),
+    UuidError(uuid::Error),
     DatabaseError(sqlx::Error),
 }
 
@@ -42,12 +43,20 @@ impl From<sqlx::Error> for ApiError {
     }
 }
 
+// implement the From trait to convert from a DatabaseError to an ApiError
+impl From<uuid::Error> for ApiError {
+    fn from(err: uuid::Error) -> Self {
+        ApiError::UuidError(err)
+    }
+}
+
 // error handler for the static server endpoint
 pub fn api_error2response(e: &ApiError) -> StatusCode {
     match e {
         ApiError::ValidationError(_) => StatusCode::BAD_REQUEST,
         ApiError::SerializationError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         ApiError::DatabaseError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+        ApiError::UuidError(_) => StatusCode::BAD_REQUEST,
     }
 }
 
@@ -63,6 +72,7 @@ impl std::fmt::Display for ApiError {
                 write!(f, "Error serializing response data: {}", err)
             }
             Self::DatabaseError(err) => write!(f, "Database error: {}", err),
+            Self::UuidError(err) => write!(f, "Uuid parsing error: {}", err),
         }
     }
 }

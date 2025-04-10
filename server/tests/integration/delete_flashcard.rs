@@ -9,7 +9,7 @@ use pavex::time::Timestamp as PavexTimestamp;
 use uuid::Uuid;
 
 #[tokio::test]
-async fn delete_flashcard_returns_no_content_when_successful() {
+async fn delete_flashcard_returns_204_when_successful() {
     // Arrange
     let api = TestApi::spawn().await;
     let flash_card = FlashCard {
@@ -49,4 +49,17 @@ async fn delete_flashcard_returns_no_content_when_successful() {
         .unwrap();
 
     assert!(deleted.is_none())
+}
+
+#[tokio::test]
+async fn delete_flashcard_returns_400_for_invalid_id() {
+    // Arrange
+    let api = TestApi::spawn().await;
+    let id = "the-wrong-card-id-value".to_string();
+
+    // Act
+    let response = api.delete_flashcard(id).await;
+
+    // Assert
+    assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }

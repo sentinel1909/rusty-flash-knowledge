@@ -61,3 +61,26 @@ async fn update_flashcard_returns_200_and_updated_flash_card() {
     assert_eq!(body.question, "updated test question");
     assert_eq!(body.answer, "updated test answer");
 }
+
+#[tokio::test]
+async fn update_flashcard_returns_400_for_invalid_id() {
+    // Arrange
+    let api = TestApi::spawn().await;
+    let updated_flash_card = UpdatedFlashCard {
+        question: Some("updated test question".to_string()),
+        answer: Some("updated test answer".to_string()),
+        topic: Some("updated topic".to_string()),
+        tags: Some(vec![
+            "differenttag1".to_string(),
+            "differenttag2".to_string(),
+        ]),
+        difficulty: Some(2),
+    };
+    let id = "the-wrong-card-id-value".to_string();
+
+    // Act
+    let response = api.update_flashcard(&updated_flash_card, id).await;
+
+    // Assert
+    assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+}
