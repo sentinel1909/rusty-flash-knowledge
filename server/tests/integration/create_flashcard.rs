@@ -26,9 +26,12 @@ async fn create_flashcard_returns_200_for_valid_data() {
 
     let body = response.json::<FlashCardResponse>().await.unwrap();
 
-    assert_eq!(body.question, new_flash_card.question);
-    assert_eq!(body.answer, new_flash_card.answer);
-    assert!(!body.id.to_string().is_empty(), "ID should be generated");
+    assert_eq!(body.content.question, new_flash_card.question);
+    assert_eq!(body.content.answer, new_flash_card.answer);
+    assert!(
+        !body.content.id.to_string().is_empty(),
+        "ID should be generated"
+    );
 }
 
 #[tokio::test]

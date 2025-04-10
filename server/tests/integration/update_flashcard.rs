@@ -57,9 +57,9 @@ async fn update_flashcard_returns_200_and_updated_flash_card() {
     assert_eq!(response.status(), StatusCode::OK);
 
     let body = response.json::<FlashCardResponse>().await.unwrap();
-    assert_eq!(body.id, id);
-    assert_eq!(body.question, "updated test question");
-    assert_eq!(body.answer, "updated test answer");
+    assert_eq!(body.content.id, id);
+    assert_eq!(body.content.question, "updated test question");
+    assert_eq!(body.content.answer, "updated test answer");
 }
 
 #[tokio::test]

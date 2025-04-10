@@ -1,6 +1,6 @@
 use crate::helpers::TestApi;
 use app::models::FlashCard;
-use app::routes::flashcards::FlashCardResponse;
+use app::routes::flashcards::{FlashCardContent, FlashCardResponse};
 use jiff_sqlx::ToSqlx;
 use pavex::http::StatusCode;
 use pavex::time::Timestamp as PavexTimestamp;
@@ -42,7 +42,10 @@ async fn list_single_flashcard_works() {
 
     let response_body: FlashCardResponse = response.json().await.unwrap();
 
-    let expected_response = FlashCardResponse::from(flash_card);
+    let expected_response: FlashCardResponse = FlashCardResponse {
+        msg: "success".to_string(),
+        content: FlashCardContent::from(flash_card),
+    };
     assert_eq!(response_body, expected_response);
 }
 

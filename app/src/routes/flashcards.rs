@@ -19,16 +19,16 @@ pub struct FlashCardParams {
     pub id: String,
 }
 
-// struct type to represent a flash card as a response body
+// struct type to represent the data for a flash card
 #[derive(Debug, Deserialize, PartialEq, Serialize)]
-pub struct FlashCardResponse {
+pub struct FlashCardContent {
     pub id: Uuid,
     pub question: String,
     pub answer: String,
 }
 
 // implement the From trait to convert the FlashCard type into a FlashCardResponse type
-impl From<FlashCard> for FlashCardResponse {
+impl From<FlashCard> for FlashCardContent {
     fn from(card: FlashCard) -> Self {
         Self {
             id: card.id,
@@ -38,13 +38,23 @@ impl From<FlashCard> for FlashCardResponse {
     }
 }
 
+// struct type to represent a flash card response
+#[derive(Debug, Deserialize, PartialEq, Serialize)]
+pub struct FlashCardResponse {
+    pub msg: String,
+    pub content: FlashCardContent,
+}
+
 // handler which lists all the flash cards in the database
 pub async fn list_flashcards_handler(db: &DatabaseConfig) -> Result<Response, ApiError> {
     let pool = db.get_pool().await;
     let flash_cards = list_flashcards(pool).await?;
     let response_body: Vec<FlashCardResponse> = flash_cards
         .into_iter()
-        .map(|flash_card| FlashCardResponse::from(flash_card))
+        .map(|flash_card| FlashCardResponse {
+            msg: "success".to_string(),
+            content: FlashCardContent::from(flash_card),
+        })
         .collect();
     let json = Json::new(response_body)?;
     Ok(Response::ok().set_typed_body(json))
@@ -61,7 +71,10 @@ pub async fn list_flashcard_handler(
     };
     let pool = db.get_pool().await;
     let flash_card = list_flashcard(pool, id).await?;
-    let response_body: FlashCardResponse = FlashCardResponse::from(flash_card);
+    let response_body: FlashCardResponse = FlashCardResponse {
+        msg: "success".to_string(),
+        content: FlashCardContent::from(flash_card),
+    };
     let json = Json::new(response_body)?;
     Ok(Response::ok().set_typed_body(json))
 }
@@ -75,7 +88,10 @@ pub async fn create_flashcard_handler(
     let pool = db.get_pool().await;
     let new_flash_card = FlashCard::try_from(body)?;
     let created_flash_card = create_flashcard(pool, new_flash_card).await?;
-    let response_body: FlashCardResponse = FlashCardResponse::from(created_flash_card);
+    let response_body: FlashCardResponse = FlashCardResponse {
+        msg: "success".to_string(),
+        content: FlashCardContent::from(created_flash_card),
+    };
     let json = Json::new(response_body)?;
     Ok(Response::ok().set_typed_body(json))
 }
@@ -93,7 +109,10 @@ pub async fn update_flashcard_handler(
     let body = body.0.clone();
     let pool = db.get_pool().await;
     let updated_flash_card = update_flashcard(pool, id, body).await?;
-    let response_body: FlashCardResponse = FlashCardResponse::from(updated_flash_card);
+    let response_body: FlashCardResponse = FlashCardResponse {
+        msg: "success".to_string(),
+        content: FlashCardContent::from(updated_flash_card),
+    };
     let json = Json::new(response_body)?;
     Ok(Response::ok().set_typed_body(json))
 }
