@@ -1,5 +1,10 @@
 use app::{UpdatedFlashCard, models::NewFlashCard};
-use pavex::{config::ConfigLoader, http::HeaderValue, server::Server};
+use pavex::{
+    config::ConfigLoader,
+    http::{HeaderMap, HeaderValue},
+    server::Server,
+};
+use reqwest::header::{AUTHORIZATION, HOST};
 use server::configuration::Profile;
 use server_sdk::{ApplicationConfig, ApplicationState, run};
 use sqlx::{Connection, Executor, PgConnection, PgPool};
@@ -35,6 +40,7 @@ pub struct TestApi {
     pub api_address: String,
     pub api_client: reqwest::Client,
     pub api_db_pool: PgPool,
+    pub api_key: String,
 }
 
 impl TestApi {
@@ -55,6 +61,7 @@ impl TestApi {
         let api_address = format!("http://{}:{}", config.server.ip, address.port());
         let api_client = reqwest::Client::new();
         let api_db_pool = config.database.get_pool().await;
+        let api_key = config.authorization.api_key.clone();
 
         let application_state = ApplicationState::new(config)
             .await
@@ -66,6 +73,7 @@ impl TestApi {
             api_address,
             api_client,
             api_db_pool,
+            api_key,
         }
     }
 
@@ -104,13 +112,25 @@ impl TestApi {
 
 /// Convenient methods for calling the API under test.
 impl TestApi {
+    async fn set_headers(&self) -> HeaderMap {
+        let mut headers = HeaderMap::new();
+        let auth = format!("Bearer {}", self.api_key);
+        headers.insert(
+            HOST,
+            HeaderValue::from_static("api.rusty-flash-knowledge.net"),
+        );
+        headers.insert(
+            AUTHORIZATION,
+            HeaderValue::from_str(&auth).expect("Invalid API key"),
+        );
+
+        headers
+    }
+
     pub async fn get_ping(&self) -> reqwest::Response {
         self.api_client
             .get(format!("{}/v1/ping", &self.api_address))
-            .header(
-                reqwest::header::HOST,
-                HeaderValue::from_static("api.rusty-flash-knowledge.net"),
-            )
+            .headers(self.set_headers().await)
             .send()
             .await
             .expect("Failed to execute request.")
@@ -119,10 +139,7 @@ impl TestApi {
     pub async fn get_flashcards(&self) -> reqwest::Response {
         self.api_client
             .get(format!("{}/v1/flashcards", &self.api_address))
-            .header(
-                reqwest::header::HOST,
-                HeaderValue::from_static("api.rusty-flash-knowledge.net"),
-            )
+            .headers(self.set_headers().await)
             .send()
             .await
             .expect("Failed to execute request.")
@@ -131,10 +148,7 @@ impl TestApi {
     pub async fn get_flashcard(&self, id: String) -> reqwest::Response {
         self.api_client
             .get(format!("{}/v1/flashcards/{}", &self.api_address, id))
-            .header(
-                reqwest::header::HOST,
-                HeaderValue::from_static("api.rusty-flash-knowledge.net"),
-            )
+            .headers(self.set_headers().await)
             .send()
             .await
             .expect("Failed to execute request.")
@@ -143,10 +157,7 @@ impl TestApi {
     pub async fn create_flashcard(&self, payload: &NewFlashCard) -> reqwest::Response {
         self.api_client
             .post(format!("{}/v1/flashcards", &self.api_address))
-            .header(
-                reqwest::header::HOST,
-                HeaderValue::from_static("api.rusty-flash-knowledge.net"),
-            )
+            .headers(self.set_headers().await)
             .json(&payload)
             .send()
             .await
@@ -156,10 +167,7 @@ impl TestApi {
     pub async fn delete_flashcard(&self, id: String) -> reqwest::Response {
         self.api_client
             .delete(format!("{}/v1/flashcards/{}", &self.api_address, id))
-            .header(
-                reqwest::header::HOST,
-                HeaderValue::from_static("api.rusty-flash-knowledge.net"),
-            )
+            .headers(self.set_headers().await)
             .send()
             .await
             .expect("Failed to execute request.")
@@ -172,10 +180,7 @@ impl TestApi {
     ) -> reqwest::Response {
         self.api_client
             .put(format!("{}/v1/flashcards/{}", &self.api_address, id))
-            .header(
-                reqwest::header::HOST,
-                HeaderValue::from_static("api.rusty-flash-knowledge.net"),
-            )
+            .headers(self.set_headers().await)
             .json(&payload)
             .send()
             .await

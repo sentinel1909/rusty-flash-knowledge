@@ -10,6 +10,7 @@ pub enum ApiError {
     SerializationError(JsonSerializationError),
     UuidError(uuid::Error),
     DatabaseError(sqlx::Error),
+    ApiKeyError,
 }
 
 // error type to represent possible data validation failure variants
@@ -57,6 +58,7 @@ pub fn api_error2response(e: &ApiError) -> StatusCode {
         ApiError::SerializationError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         ApiError::DatabaseError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         ApiError::UuidError(_) => StatusCode::BAD_REQUEST,
+        ApiError::ApiKeyError => StatusCode::UNAUTHORIZED,
     }
 }
 
@@ -73,6 +75,7 @@ impl std::fmt::Display for ApiError {
             }
             Self::DatabaseError(err) => write!(f, "Database error: {}", err),
             Self::UuidError(err) => write!(f, "Uuid parsing error: {}", err),
+            Self::ApiKeyError => write!(f, "Invalid API key"),
         }
     }
 }

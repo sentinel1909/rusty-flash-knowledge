@@ -11,4 +11,5 @@ database:
   password: "password"
   database_name: "rusty_flash_knowledge_db"
   require_ssl: false
-
+authorization:
+  api_key: "supersecretapikey"
