@@ -13,6 +13,7 @@ use sqlx::postgres::{PgConnectOptions, PgPool, PgPoolOptions, PgSslMode};
 pub fn register(bp: &mut Blueprint) {
     bp.config("server", t!(self::ServerConfig));
     bp.config("database", t!(self::DatabaseConfig));
+    bp.config("authorization", t!(self::AuthConfig));
 }
 
 #[derive(serde::Deserialize, Debug, Clone)]
@@ -103,4 +104,10 @@ impl DatabaseConfig {
             .acquire_timeout(std::time::Duration::from_secs(2))
             .connect_lazy_with(self.with_db())
     }
+}
+
+// struct type to represent the API key configuration value
+#[derive(Clone, Debug, Deserialize)]
+pub struct AuthConfig {
+    pub api_key: String,
 }

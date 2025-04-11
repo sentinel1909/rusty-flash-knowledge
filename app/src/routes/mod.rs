@@ -9,6 +9,8 @@ use pavex::f;
 
 fn api_bp() -> Blueprint {
     let mut bp = Blueprint::new();
+    bp.pre_process(f!(crate::middleware::validate_api_key))
+        .error_handler(f!(crate::errors::api_error2response));
     bp.route(GET, "/ping", f!(self::ping::get));
     bp.route(
         GET,
