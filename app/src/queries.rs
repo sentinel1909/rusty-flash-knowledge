@@ -47,13 +47,13 @@ pub async fn create_flashcard(pool: PgPool, new_card: FlashCard) -> Result<Flash
 }
 
 // function which queries the database, given a flash card id, and deletes that entry
-pub async fn delete_flashcard(pool: PgPool, id: Uuid) -> Result<(), ApiError> {
-    sqlx::query("DELETE FROM flashcards WHERE id = $1;")
+pub async fn delete_flashcard(pool: PgPool, id: Uuid) -> Result<u64, ApiError> {
+    let result = sqlx::query("DELETE FROM flashcards WHERE id = $1;")
         .bind(id)
         .execute(&pool)
         .await?;
 
-    Ok(())
+    Ok(result.rows_affected())
 }
 
 // function which queries the database, given a flashcard id, and updates that entry

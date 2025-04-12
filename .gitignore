@@ -3,6 +3,9 @@
 # VS Code Settings
 .vscode
 
+# Caddy local proxy config
+Caddyfile
+
 # Build artifacts
 /target
 

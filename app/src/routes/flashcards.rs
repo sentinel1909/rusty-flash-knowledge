@@ -65,10 +65,7 @@ pub async fn list_flashcard_handler(
     db: &DatabaseConfig,
     params: &PathParams<FlashCardParams>,
 ) -> Result<Response, ApiError> {
-    let id = match Uuid::parse_str(&params.0.id) {
-        Ok(uuid) => uuid,
-        Err(e) => return Err(ApiError::UuidError(e)),
-    };
+    let id = Uuid::parse_str(&params.0.id).map_err(ApiError::UuidError)?;
     let pool = db.get_pool().await;
     let flash_card = list_flashcard(pool, id).await?;
     let response_body: FlashCardResponse = FlashCardResponse {
@@ -102,10 +99,7 @@ pub async fn update_flashcard_handler(
     body: &JsonBody<UpdatedFlashCard>,
     params: &PathParams<FlashCardParams>,
 ) -> Result<Response, ApiError> {
-    let id = match Uuid::parse_str(&params.0.id) {
-        Ok(uuid) => uuid,
-        Err(e) => return Err(ApiError::UuidError(e)),
-    };
+    let id = Uuid::parse_str(&params.0.id).map_err(ApiError::UuidError)?;
     let body = body.0.clone();
     let pool = db.get_pool().await;
     let updated_flash_card = update_flashcard(pool, id, body).await?;
@@ -122,11 +116,15 @@ pub async fn delete_flashcard_handler(
     db: &DatabaseConfig,
     params: &PathParams<FlashCardParams>,
 ) -> Result<Response, ApiError> {
-    let id = match Uuid::parse_str(&params.0.id) {
-        Ok(uuid) => uuid,
-        Err(e) => return Err(ApiError::UuidError(e)),
-    };
+    let id = Uuid::parse_str(&params.0.id).map_err(ApiError::UuidError)?;
     let pool = db.get_pool().await;
-    delete_flashcard(pool, id).await?;
+    let deleted = delete_flashcard(pool, id).await?;
+    if deleted == 0 {
+        return Err(ApiError::NotFound(format!(
+            "Flashcard with id {} not found",
+            id
+        )));
+    }
+
     Ok(Response::no_content())
 }

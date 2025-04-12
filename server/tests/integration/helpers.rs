@@ -127,6 +127,30 @@ impl TestApi {
         headers
     }
 
+    pub async fn get_no_api_key(&self) -> reqwest::Response {
+        self.api_client
+            .get(format!("{}/v1/flashcards", &self.api_address))
+            .header(HOST, "api.rusty-flash-knowledge.net")
+            .send()
+            .await
+            .expect("Failed to execute request.")
+    }
+
+    pub async fn get_invalid_api_key(&self) -> reqwest::Response {
+        let mut headers = HeaderMap::new();
+        headers.insert(
+            HOST,
+            HeaderValue::from_static("api.rusty-flash-knowledge.net"),
+        );
+        headers.insert(AUTHORIZATION, HeaderValue::from_static("the-wrong-api-key"));
+        self.api_client
+            .get(format!("{}/v1/flashcards", &self.api_address))
+            .headers(headers)
+            .send()
+            .await
+            .expect("Failed to execute request.")
+    }
+
     pub async fn get_ping(&self) -> reqwest::Response {
         self.api_client
             .get(format!("{}/v1/ping", &self.api_address))

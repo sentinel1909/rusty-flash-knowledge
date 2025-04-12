@@ -63,3 +63,16 @@ async fn delete_flashcard_returns_400_for_invalid_id() {
     // Assert
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
+
+#[tokio::test]
+async fn delete_flashcard_returns_404_for_non_existent_id() {
+    // Arrange
+    let api = TestApi::spawn().await;
+    let non_existent_id = Uuid::new_v4().to_string(); // Valid UUID, but not in DB
+
+    // Act
+    let response = api.delete_flashcard(non_existent_id).await;
+
+    // Assert
+    assert_eq!(response.status(), StatusCode::NOT_FOUND);
+}
