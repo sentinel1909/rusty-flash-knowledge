@@ -77,3 +77,13 @@ pub async fn update_flashcard(
 
     Ok(updated_flash_card)
 }
+
+// function which queries the database and returns a random flash card
+pub async fn random_flashcard(pool: PgPool) -> Result<Option<FlashCard>, sqlx::Error> {
+    let random_card =
+        sqlx::query_as::<_, FlashCard>("SELECT * FROM flashcards ORDER BY RANDOM() LIMIT 1;")
+            .fetch_optional(&pool)
+            .await?;
+
+    Ok(random_card)
+}

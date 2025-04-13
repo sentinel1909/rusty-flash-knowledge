@@ -5,7 +5,8 @@ use crate::configuration::DatabaseConfig;
 use crate::errors::ApiError;
 use crate::models::{FlashCard, NewFlashCard, UpdatedFlashCard};
 use crate::queries::{
-    create_flashcard, delete_flashcard, list_flashcard, list_flashcards, update_flashcard,
+    create_flashcard, delete_flashcard, list_flashcard, list_flashcards, random_flashcard,
+    update_flashcard,
 };
 use pavex::request::body::JsonBody;
 use pavex::request::path::PathParams;
@@ -139,4 +140,23 @@ pub async fn delete_flashcard_handler(
     }
 
     Ok(Response::no_content())
+}
+
+// handler which retrieves a random flash card from the database
+pub async fn random_flashcard_handler(db: &DatabaseConfig) -> Result<Response, ApiError> {
+    let pool = db.get_pool().await;
+
+    let random_card = random_flashcard(pool).await?;
+
+    match random_card {
+        Some(card) => {
+            let response = FlashCardResponse {
+                msg: "success".to_string(),
+                content: FlashCardContent::from(card),
+            };
+            let json = Json::new(response)?;
+            Ok(Response::ok().set_typed_body(json))
+        }
+        None => Err(ApiError::NotFound("No flashcards available".into())),
+    }
 }

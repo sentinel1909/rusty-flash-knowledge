@@ -62,6 +62,7 @@ pub fn run(
 struct Router {
     domain_router: matchit::Router<u32>,
     domain_0: matchit::Router<u32>,
+    domain_1: matchit::Router<u32>,
 }
 impl Router {
     /// Create a new router instance.
@@ -71,11 +72,13 @@ impl Router {
         Self {
             domain_router: Self::domain_router(),
             domain_0: Self::domain_0_router(),
+            domain_1: Self::domain_1_router(),
         }
     }
     fn domain_router() -> matchit::Router<u32> {
         let mut router = matchit::Router::new();
         router.insert("ten/egdelwonk-hsalf-ytsur/ipa", 0u32).unwrap();
+        router.insert("ten/egdelwonk-hsalf-ytsur", 1u32).unwrap();
         router
     }
     fn domain_0_router() -> matchit::Router<u32> {
@@ -83,6 +86,11 @@ impl Router {
         router.insert("/v1/flashcards", 0u32).unwrap();
         router.insert("/v1/flashcards/{id}", 1u32).unwrap();
         router.insert("/v1/ping", 2u32).unwrap();
+        router
+    }
+    fn domain_1_router() -> matchit::Router<u32> {
+        let mut router = matchit::Router::new();
+        router.insert("/flashcards/random", 0u32).unwrap();
         router
     }
     pub async fn route(
@@ -103,6 +111,7 @@ impl Router {
             if let Ok(m) = self.domain_router.at(host.as_str()) {
                 return match m.value {
                     0u32 => self.route_domain_0(request, connection_info, state).await,
+                    1u32 => self.route_domain_1(request, connection_info, state).await,
                     i => unreachable!("Unknown domain id: {}", i),
                 };
             }
@@ -274,6 +283,64 @@ impl Router {
                             .into();
                         let matched_route_template = pavex::request::path::MatchedPathPattern::new(
                             "/v1/ping",
+                        );
+                        route_0::entrypoint(
+                                &request_head,
+                                matched_route_template,
+                                &allowed_methods,
+                            )
+                            .await
+                    }
+                }
+            }
+            i => unreachable!("Unknown route id: {}", i),
+        }
+    }
+    async fn route_domain_1(
+        &self,
+        request: http::Request<hyper::body::Incoming>,
+        _connection_info: Option<pavex::connection::ConnectionInfo>,
+        #[allow(unused)]
+        state: &ApplicationState,
+    ) -> pavex::response::Response {
+        let (request_head, _) = request.into_parts();
+        let request_head: pavex::request::RequestHead = request_head.into();
+        let Ok(matched_route) = self.domain_1.at(&request_head.target.path()) else {
+            let allowed_methods: pavex::router::AllowedMethods = pavex::router::MethodAllowList::from_iter(
+                    vec![],
+                )
+                .into();
+            let matched_route_template = pavex::request::path::MatchedPathPattern::new(
+                "*",
+            );
+            return route_0::entrypoint(
+                    &request_head,
+                    matched_route_template,
+                    &allowed_methods,
+                )
+                .await;
+        };
+        match matched_route.value {
+            0u32 => {
+                match &request_head.method {
+                    &pavex::http::Method::GET => {
+                        let matched_route_template = pavex::request::path::MatchedPathPattern::new(
+                            "/flashcards/random",
+                        );
+                        route_7::entrypoint(
+                                &request_head,
+                                matched_route_template,
+                                &state.database_config,
+                            )
+                            .await
+                    }
+                    _ => {
+                        let allowed_methods: pavex::router::AllowedMethods = pavex::router::MethodAllowList::from_iter([
+                                pavex::http::Method::GET,
+                            ])
+                            .into();
+                        let matched_route_template = pavex::request::path::MatchedPathPattern::new(
+                            "/flashcards/random",
                         );
                         route_0::entrypoint(
                                 &request_head,
@@ -1591,6 +1658,135 @@ pub mod route_6 {
         type IntoFuture = T;
         fn into_future(self) -> Self::IntoFuture {
             (self.next)(self.s_0, self.s_1, self.s_2, self.s_3, self.s_4)
+        }
+    }
+}
+pub mod route_7 {
+    pub async fn entrypoint<'a, 'b>(
+        s_0: &'a pavex::request::RequestHead,
+        s_1: pavex::request::path::MatchedPathPattern,
+        s_2: &'b app::configuration::DatabaseConfig,
+    ) -> pavex::response::Response {
+        let response = wrapping_0(s_0, s_1, s_2).await;
+        response
+    }
+    async fn stage_1<'a, 'b>(
+        s_0: &'a app::configuration::DatabaseConfig,
+        s_1: &'b pavex::request::RequestHead,
+        s_2: pavex::request::path::MatchedPathPattern,
+    ) -> pavex::response::Response {
+        let response = wrapping_1(s_1, s_2, s_0).await;
+        response
+    }
+    async fn stage_2<'a, 'b>(
+        s_0: &'a pavex_tracing::RootSpan,
+        s_1: &'b app::configuration::DatabaseConfig,
+    ) -> pavex::response::Response {
+        let response = handler(s_0, s_1).await;
+        let response = post_processing_0(response, s_0).await;
+        response
+    }
+    async fn wrapping_0(
+        v0: &pavex::request::RequestHead,
+        v1: pavex::request::path::MatchedPathPattern,
+        v2: &app::configuration::DatabaseConfig,
+    ) -> pavex::response::Response {
+        let v3 = crate::route_7::Next0 {
+            s_0: v2,
+            s_1: v0,
+            s_2: v1,
+            next: stage_1,
+        };
+        let v4 = pavex::middleware::Next::new(v3);
+        let v5 = pavex::middleware::wrap_noop(v4).await;
+        <pavex::response::Response as pavex::response::IntoResponse>::into_response(v5)
+    }
+    async fn wrapping_1(
+        v0: &pavex::request::RequestHead,
+        v1: pavex::request::path::MatchedPathPattern,
+        v2: &app::configuration::DatabaseConfig,
+    ) -> pavex::response::Response {
+        let v3 = pavex::telemetry::ServerRequestId::generate();
+        let v4 = app::telemetry::root_span(v0, v1, v3);
+        let v5 = crate::route_7::Next1 {
+            s_0: &v4,
+            s_1: v2,
+            next: stage_2,
+        };
+        let v6 = pavex::middleware::Next::new(v5);
+        let v7 = <pavex_tracing::RootSpan as core::clone::Clone>::clone(&v4);
+        let v8 = pavex_tracing::logger(v7, v6).await;
+        <pavex::response::Response as pavex::response::IntoResponse>::into_response(v8)
+    }
+    async fn handler(
+        v0: &pavex_tracing::RootSpan,
+        v1: &app::configuration::DatabaseConfig,
+    ) -> pavex::response::Response {
+        let v2 = app::routes::flashcards::random_flashcard_handler(v1).await;
+        let v3 = match v2 {
+            Ok(ok) => ok,
+            Err(v3) => {
+                return {
+                    let v4 = app::api_error2response(&v3);
+                    let v5 = pavex::Error::new(v3);
+                    app::telemetry::error_logger(&v5, v0).await;
+                    <http::StatusCode as pavex::response::IntoResponse>::into_response(
+                        v4,
+                    )
+                };
+            }
+        };
+        <pavex::response::Response as pavex::response::IntoResponse>::into_response(v3)
+    }
+    async fn post_processing_0(
+        v0: pavex::response::Response,
+        v1: &pavex_tracing::RootSpan,
+    ) -> pavex::response::Response {
+        let v2 = app::telemetry::response_logger(v0, v1).await;
+        <pavex::response::Response as pavex::response::IntoResponse>::into_response(v2)
+    }
+    struct Next0<'a, 'b, T>
+    where
+        T: std::future::Future<Output = pavex::response::Response>,
+    {
+        s_0: &'a app::configuration::DatabaseConfig,
+        s_1: &'b pavex::request::RequestHead,
+        s_2: pavex::request::path::MatchedPathPattern,
+        next: fn(
+            &'a app::configuration::DatabaseConfig,
+            &'b pavex::request::RequestHead,
+            pavex::request::path::MatchedPathPattern,
+        ) -> T,
+    }
+    impl<'a, 'b, T> std::future::IntoFuture for Next0<'a, 'b, T>
+    where
+        T: std::future::Future<Output = pavex::response::Response>,
+    {
+        type Output = pavex::response::Response;
+        type IntoFuture = T;
+        fn into_future(self) -> Self::IntoFuture {
+            (self.next)(self.s_0, self.s_1, self.s_2)
+        }
+    }
+    struct Next1<'a, 'b, T>
+    where
+        T: std::future::Future<Output = pavex::response::Response>,
+    {
+        s_0: &'a pavex_tracing::RootSpan,
+        s_1: &'b app::configuration::DatabaseConfig,
+        next: fn(
+            &'a pavex_tracing::RootSpan,
+            &'b app::configuration::DatabaseConfig,
+        ) -> T,
+    }
+    impl<'a, 'b, T> std::future::IntoFuture for Next1<'a, 'b, T>
+    where
+        T: std::future::Future<Output = pavex::response::Response>,
+    {
+        type Output = pavex::response::Response;
+        type IntoFuture = T;
+        fn into_future(self) -> Self::IntoFuture {
+            (self.next)(self.s_0, self.s_1)
         }
     }
 }
