@@ -11,6 +11,7 @@ use pavex::request::body::JsonBody;
 use pavex::request::path::PathParams;
 use pavex::response::{Response, body::Json};
 use serde::{Deserialize, Serialize};
+use sqlx::postgres::PgDatabaseError;
 use uuid::Uuid;
 
 // struct type to represent the path parameters of an incoming request
@@ -81,10 +82,22 @@ pub async fn create_flashcard_handler(
     db: &DatabaseConfig,
     body: &JsonBody<NewFlashCard>,
 ) -> Result<Response, ApiError> {
-    let body = body.0.clone();
     let pool = db.get_pool().await;
-    let new_flash_card = FlashCard::try_from(body)?;
-    let created_flash_card = create_flashcard(pool, new_flash_card).await?;
+    let new_flash_card = FlashCard::try_from(body.0.clone())?;
+    let created_flash_card = match create_flashcard(pool, &new_flash_card).await {
+        Ok(card) => card,
+        Err(e) => {
+            if let sqlx::Error::Database(db_err) = &e {
+                if let Some(pg_err) = db_err.try_downcast_ref::<PgDatabaseError>() {
+                    if pg_err.constraint() == Some("flashcards_question_key") {
+                        return Err(ApiError::DuplicateQuestion(new_flash_card.question));
+                    }
+                }
+            }
+
+            return Err(ApiError::from(e)); // use the original error
+        }
+    };
     let response_body: FlashCardResponse = FlashCardResponse {
         msg: "success".to_string(),
         content: FlashCardContent::from(created_flash_card),
@@ -100,9 +113,8 @@ pub async fn update_flashcard_handler(
     params: &PathParams<FlashCardParams>,
 ) -> Result<Response, ApiError> {
     let id = Uuid::parse_str(&params.0.id).map_err(ApiError::UuidError)?;
-    let body = body.0.clone();
     let pool = db.get_pool().await;
-    let updated_flash_card = update_flashcard(pool, id, body).await?;
+    let updated_flash_card = update_flashcard(pool, id, &body.0).await?;
     let response_body: FlashCardResponse = FlashCardResponse {
         msg: "success".to_string(),
         content: FlashCardContent::from(updated_flash_card),

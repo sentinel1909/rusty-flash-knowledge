@@ -1,11 +1,14 @@
 -- Add up migration script here
 CREATE TABLE IF NOT EXISTS flashcards (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    question TEXT NOT NULL,
+    id UUID PRIMARY KEY,
+    question TEXT NOT NULL UNIQUE,
     answer TEXT NOT NULL,
     topic TEXT,
     tags TEXT[],
     difficulty INT,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMPTZ NOT NULL,
+    updated_at TIMESTAMPTZ
 );
+
+CREATE INDEX idx_flashcards_topic ON flashcards(topic);
+CREATE INDEX idx_flashcards_tags ON flashcards USING GIN (tags);

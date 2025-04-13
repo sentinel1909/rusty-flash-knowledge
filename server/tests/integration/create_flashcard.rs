@@ -77,3 +77,23 @@ async fn create_returns_500_if_there_is_a_fatal_database_error() {
     // Assert
     assert_eq!(response.status(), StatusCode::INTERNAL_SERVER_ERROR);
 }
+
+#[tokio::test]
+async fn create_flashcard_returns_409_for_duplicate_question() {
+    let api = TestApi::spawn().await;
+    let flashcard = NewFlashCard {
+        question: "What is Rust?".to_string(),
+        answer: "A system programming language.".to_string(),
+        topic: "intro".to_string(),
+        tags: vec!["basics".to_string()],
+        difficulty: 1,
+    };
+
+    // First insertion should succeed
+    let first = api.create_flashcard(&flashcard).await;
+    assert_eq!(first.status(), StatusCode::OK);
+
+    // Second insertion with same question should fail
+    let second = api.create_flashcard(&flashcard).await;
+    assert_eq!(second.status(), StatusCode::CONFLICT);
+}

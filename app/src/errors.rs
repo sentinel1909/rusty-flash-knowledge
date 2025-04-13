@@ -12,6 +12,7 @@ pub enum ApiError {
     DatabaseError(sqlx::Error),
     ApiKeyError,
     NotFound(String),
+    DuplicateQuestion(String),
 }
 
 // error type to represent possible data validation failure variants
@@ -61,6 +62,7 @@ pub fn api_error2response(e: &ApiError) -> StatusCode {
         ApiError::UuidError(_) => StatusCode::BAD_REQUEST,
         ApiError::ApiKeyError => StatusCode::UNAUTHORIZED,
         ApiError::NotFound(_) => StatusCode::NOT_FOUND,
+        ApiError::DuplicateQuestion(_) => StatusCode::CONFLICT,
     }
 }
 
@@ -79,6 +81,7 @@ impl std::fmt::Display for ApiError {
             Self::UuidError(err) => write!(f, "Uuid parsing error: {}", err),
             Self::ApiKeyError => write!(f, "Invalid API key"),
             Self::NotFound(err) => write!(f, "Not found: {}", err),
+            Self::DuplicateQuestion(err) => write!(f, "Questions must be unique: {}", err),
         }
     }
 }
