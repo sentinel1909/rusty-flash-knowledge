@@ -1,9 +1,9 @@
 mod create_flashcard;
 mod delete_flashcard;
+mod health_check;
 mod helpers;
 mod list_flashcard;
 mod list_flashcards;
 mod middleware;
-mod ping;
 mod random_flashcard;
 mod update_flashcard;

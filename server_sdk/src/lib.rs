@@ -85,12 +85,12 @@ impl Router {
         let mut router = matchit::Router::new();
         router.insert("/v1/flashcards", 0u32).unwrap();
         router.insert("/v1/flashcards/{id}", 1u32).unwrap();
-        router.insert("/v1/ping", 2u32).unwrap();
         router
     }
     fn domain_1_router() -> matchit::Router<u32> {
         let mut router = matchit::Router::new();
-        router.insert("/flashcards/random", 0u32).unwrap();
+        router.insert("/flashcards/health", 0u32).unwrap();
+        router.insert("/flashcards/random", 1u32).unwrap();
         router
     }
     pub async fn route(
@@ -163,7 +163,7 @@ impl Router {
                         let matched_route_template = pavex::request::path::MatchedPathPattern::new(
                             "/v1/flashcards",
                         );
-                        route_2::entrypoint(
+                        route_1::entrypoint(
                                 &request_head,
                                 &state.auth_config,
                                 matched_route_template,
@@ -175,7 +175,7 @@ impl Router {
                         let matched_route_template = pavex::request::path::MatchedPathPattern::new(
                             "/v1/flashcards",
                         );
-                        route_4::entrypoint(
+                        route_3::entrypoint(
                                 &state.database_config,
                                 request_body,
                                 &state.auth_config,
@@ -208,7 +208,7 @@ impl Router {
                         let matched_route_template = pavex::request::path::MatchedPathPattern::new(
                             "/v1/flashcards/{id}",
                         );
-                        route_3::entrypoint(
+                        route_2::entrypoint(
                                 url_params,
                                 &request_head,
                                 &state.auth_config,
@@ -221,7 +221,7 @@ impl Router {
                         let matched_route_template = pavex::request::path::MatchedPathPattern::new(
                             "/v1/flashcards/{id}",
                         );
-                        route_5::entrypoint(
+                        route_4::entrypoint(
                                 &state.database_config,
                                 url_params,
                                 request_body,
@@ -235,7 +235,7 @@ impl Router {
                         let matched_route_template = pavex::request::path::MatchedPathPattern::new(
                             "/v1/flashcards/{id}",
                         );
-                        route_6::entrypoint(
+                        route_5::entrypoint(
                                 url_params,
                                 &request_head,
                                 &state.auth_config,
@@ -253,36 +253,6 @@ impl Router {
                             .into();
                         let matched_route_template = pavex::request::path::MatchedPathPattern::new(
                             "/v1/flashcards/{id}",
-                        );
-                        route_0::entrypoint(
-                                &request_head,
-                                matched_route_template,
-                                &allowed_methods,
-                            )
-                            .await
-                    }
-                }
-            }
-            2u32 => {
-                match &request_head.method {
-                    &pavex::http::Method::GET => {
-                        let matched_route_template = pavex::request::path::MatchedPathPattern::new(
-                            "/v1/ping",
-                        );
-                        route_1::entrypoint(
-                                &state.auth_config,
-                                matched_route_template,
-                                &request_head,
-                            )
-                            .await
-                    }
-                    _ => {
-                        let allowed_methods: pavex::router::AllowedMethods = pavex::router::MethodAllowList::from_iter([
-                                pavex::http::Method::GET,
-                            ])
-                            .into();
-                        let matched_route_template = pavex::request::path::MatchedPathPattern::new(
-                            "/v1/ping",
                         );
                         route_0::entrypoint(
                                 &request_head,
@@ -322,6 +292,31 @@ impl Router {
         };
         match matched_route.value {
             0u32 => {
+                match &request_head.method {
+                    &pavex::http::Method::GET => {
+                        let matched_route_template = pavex::request::path::MatchedPathPattern::new(
+                            "/flashcards/health",
+                        );
+                        route_6::entrypoint(matched_route_template, &request_head).await
+                    }
+                    _ => {
+                        let allowed_methods: pavex::router::AllowedMethods = pavex::router::MethodAllowList::from_iter([
+                                pavex::http::Method::GET,
+                            ])
+                            .into();
+                        let matched_route_template = pavex::request::path::MatchedPathPattern::new(
+                            "/flashcards/health",
+                        );
+                        route_0::entrypoint(
+                                &request_head,
+                                matched_route_template,
+                                &allowed_methods,
+                            )
+                            .await
+                    }
+                }
+            }
+            1u32 => {
                 match &request_head.method {
                     &pavex::http::Method::GET => {
                         let matched_route_template = pavex::request::path::MatchedPathPattern::new(
@@ -466,153 +461,6 @@ pub mod route_0 {
     }
 }
 pub mod route_1 {
-    pub async fn entrypoint<'a, 'b>(
-        s_0: &'a app::configuration::AuthConfig,
-        s_1: pavex::request::path::MatchedPathPattern,
-        s_2: &'b pavex::request::RequestHead,
-    ) -> pavex::response::Response {
-        let response = wrapping_0(s_0, s_1, s_2).await;
-        response
-    }
-    async fn stage_1<'a, 'b>(
-        s_0: &'a pavex::request::RequestHead,
-        s_1: &'b app::configuration::AuthConfig,
-        s_2: pavex::request::path::MatchedPathPattern,
-    ) -> pavex::response::Response {
-        let response = wrapping_1(s_1, s_2, s_0).await;
-        response
-    }
-    async fn stage_2<'a, 'b, 'c>(
-        s_0: &'a pavex_tracing::RootSpan,
-        s_1: &'b pavex::request::RequestHead,
-        s_2: &'c app::configuration::AuthConfig,
-    ) -> pavex::response::Response {
-        let response = 'incoming: {
-            if let Some(response) = pre_processing_0(s_1, s_0, s_2).await.into_response()
-            {
-                break 'incoming response;
-            }
-            handler().await
-        };
-        let response = post_processing_0(response, s_0).await;
-        response
-    }
-    async fn wrapping_0(
-        v0: &app::configuration::AuthConfig,
-        v1: pavex::request::path::MatchedPathPattern,
-        v2: &pavex::request::RequestHead,
-    ) -> pavex::response::Response {
-        let v3 = crate::route_1::Next0 {
-            s_0: v2,
-            s_1: v0,
-            s_2: v1,
-            next: stage_1,
-        };
-        let v4 = pavex::middleware::Next::new(v3);
-        let v5 = pavex::middleware::wrap_noop(v4).await;
-        <pavex::response::Response as pavex::response::IntoResponse>::into_response(v5)
-    }
-    async fn wrapping_1(
-        v0: &app::configuration::AuthConfig,
-        v1: pavex::request::path::MatchedPathPattern,
-        v2: &pavex::request::RequestHead,
-    ) -> pavex::response::Response {
-        let v3 = pavex::telemetry::ServerRequestId::generate();
-        let v4 = app::telemetry::root_span(v2, v1, v3);
-        let v5 = crate::route_1::Next1 {
-            s_0: &v4,
-            s_1: v2,
-            s_2: v0,
-            next: stage_2,
-        };
-        let v6 = pavex::middleware::Next::new(v5);
-        let v7 = <pavex_tracing::RootSpan as core::clone::Clone>::clone(&v4);
-        let v8 = pavex_tracing::logger(v7, v6).await;
-        <pavex::response::Response as pavex::response::IntoResponse>::into_response(v8)
-    }
-    async fn pre_processing_0(
-        v0: &pavex::request::RequestHead,
-        v1: &pavex_tracing::RootSpan,
-        v2: &app::configuration::AuthConfig,
-    ) -> pavex::middleware::Processing<pavex::response::Response> {
-        let v3 = app::validate_api_key(v2, v0).await;
-        let v4 = match v3 {
-            Ok(ok) => ok,
-            Err(v4) => {
-                return {
-                    let v5 = app::api_error2response(&v4);
-                    let v6 = pavex::Error::new(v4);
-                    let v7 = {
-                        app::telemetry::error_logger(&v6, v1).await;
-                        <http::StatusCode as pavex::response::IntoResponse>::into_response(
-                            v5,
-                        )
-                    };
-                    pavex::middleware::Processing::EarlyReturn(v7)
-                };
-            }
-        };
-        v4
-    }
-    async fn handler() -> pavex::response::Response {
-        let v0 = app::routes::ping::get();
-        <http::StatusCode as pavex::response::IntoResponse>::into_response(v0)
-    }
-    async fn post_processing_0(
-        v0: pavex::response::Response,
-        v1: &pavex_tracing::RootSpan,
-    ) -> pavex::response::Response {
-        let v2 = app::telemetry::response_logger(v0, v1).await;
-        <pavex::response::Response as pavex::response::IntoResponse>::into_response(v2)
-    }
-    struct Next0<'a, 'b, T>
-    where
-        T: std::future::Future<Output = pavex::response::Response>,
-    {
-        s_0: &'a pavex::request::RequestHead,
-        s_1: &'b app::configuration::AuthConfig,
-        s_2: pavex::request::path::MatchedPathPattern,
-        next: fn(
-            &'a pavex::request::RequestHead,
-            &'b app::configuration::AuthConfig,
-            pavex::request::path::MatchedPathPattern,
-        ) -> T,
-    }
-    impl<'a, 'b, T> std::future::IntoFuture for Next0<'a, 'b, T>
-    where
-        T: std::future::Future<Output = pavex::response::Response>,
-    {
-        type Output = pavex::response::Response;
-        type IntoFuture = T;
-        fn into_future(self) -> Self::IntoFuture {
-            (self.next)(self.s_0, self.s_1, self.s_2)
-        }
-    }
-    struct Next1<'a, 'b, 'c, T>
-    where
-        T: std::future::Future<Output = pavex::response::Response>,
-    {
-        s_0: &'a pavex_tracing::RootSpan,
-        s_1: &'b pavex::request::RequestHead,
-        s_2: &'c app::configuration::AuthConfig,
-        next: fn(
-            &'a pavex_tracing::RootSpan,
-            &'b pavex::request::RequestHead,
-            &'c app::configuration::AuthConfig,
-        ) -> T,
-    }
-    impl<'a, 'b, 'c, T> std::future::IntoFuture for Next1<'a, 'b, 'c, T>
-    where
-        T: std::future::Future<Output = pavex::response::Response>,
-    {
-        type Output = pavex::response::Response;
-        type IntoFuture = T;
-        fn into_future(self) -> Self::IntoFuture {
-            (self.next)(self.s_0, self.s_1, self.s_2)
-        }
-    }
-}
-pub mod route_2 {
     pub async fn entrypoint<'a, 'b, 'c>(
         s_0: &'a pavex::request::RequestHead,
         s_1: &'b app::configuration::AuthConfig,
@@ -653,7 +501,7 @@ pub mod route_2 {
         v2: pavex::request::path::MatchedPathPattern,
         v3: &app::configuration::DatabaseConfig,
     ) -> pavex::response::Response {
-        let v4 = crate::route_2::Next0 {
+        let v4 = crate::route_1::Next0 {
             s_0: v3,
             s_1: v0,
             s_2: v1,
@@ -672,7 +520,7 @@ pub mod route_2 {
     ) -> pavex::response::Response {
         let v4 = pavex::telemetry::ServerRequestId::generate();
         let v5 = app::telemetry::root_span(v0, v2, v4);
-        let v6 = crate::route_2::Next1 {
+        let v6 = crate::route_1::Next1 {
             s_0: &v5,
             s_1: v3,
             s_2: v0,
@@ -786,7 +634,7 @@ pub mod route_2 {
         }
     }
 }
-pub mod route_3 {
+pub mod route_2 {
     pub async fn entrypoint<'a, 'b, 'c, 'd, 'e>(
         s_0: pavex::request::path::RawPathParams<'a, 'b>,
         s_1: &'c pavex::request::RequestHead,
@@ -831,7 +679,7 @@ pub mod route_3 {
         v3: pavex::request::path::MatchedPathPattern,
         v4: &app::configuration::DatabaseConfig,
     ) -> pavex::response::Response {
-        let v5 = crate::route_3::Next0 {
+        let v5 = crate::route_2::Next0 {
             s_0: v0,
             s_1: v4,
             s_2: v1,
@@ -852,7 +700,7 @@ pub mod route_3 {
     ) -> pavex::response::Response {
         let v5 = pavex::telemetry::ServerRequestId::generate();
         let v6 = app::telemetry::root_span(v1, v3, v5);
-        let v7 = crate::route_3::Next1 {
+        let v7 = crate::route_2::Next1 {
             s_0: &v6,
             s_1: v0,
             s_2: v4,
@@ -989,7 +837,7 @@ pub mod route_3 {
         }
     }
 }
-pub mod route_4 {
+pub mod route_3 {
     pub async fn entrypoint<'a, 'b, 'c>(
         s_0: &'a app::configuration::DatabaseConfig,
         s_1: pavex::request::body::RawIncomingBody,
@@ -1034,7 +882,7 @@ pub mod route_4 {
         v3: pavex::request::path::MatchedPathPattern,
         v4: &pavex::request::RequestHead,
     ) -> pavex::response::Response {
-        let v5 = crate::route_4::Next0 {
+        let v5 = crate::route_3::Next0 {
             s_0: v4,
             s_1: v1,
             s_2: v0,
@@ -1055,7 +903,7 @@ pub mod route_4 {
     ) -> pavex::response::Response {
         let v5 = pavex::telemetry::ServerRequestId::generate();
         let v6 = app::telemetry::root_span(v4, v3, v5);
-        let v7 = crate::route_4::Next1 {
+        let v7 = crate::route_3::Next1 {
             s_0: &v6,
             s_1: v4,
             s_2: v1,
@@ -1209,7 +1057,7 @@ pub mod route_4 {
         }
     }
 }
-pub mod route_5 {
+pub mod route_4 {
     pub async fn entrypoint<'a, 'b, 'c, 'd, 'e>(
         s_0: &'a app::configuration::DatabaseConfig,
         s_1: pavex::request::path::RawPathParams<'b, 'c>,
@@ -1258,7 +1106,7 @@ pub mod route_5 {
         v4: pavex::request::path::MatchedPathPattern,
         v5: &pavex::request::RequestHead,
     ) -> pavex::response::Response {
-        let v6 = crate::route_5::Next0 {
+        let v6 = crate::route_4::Next0 {
             s_0: v5,
             s_1: v1,
             s_2: v2,
@@ -1281,7 +1129,7 @@ pub mod route_5 {
     ) -> pavex::response::Response {
         let v6 = pavex::telemetry::ServerRequestId::generate();
         let v7 = app::telemetry::root_span(v5, v4, v6);
-        let v8 = crate::route_5::Next1 {
+        let v8 = crate::route_4::Next1 {
             s_0: &v7,
             s_1: v5,
             s_2: v1,
@@ -1458,7 +1306,7 @@ pub mod route_5 {
         }
     }
 }
-pub mod route_6 {
+pub mod route_5 {
     pub async fn entrypoint<'a, 'b, 'c, 'd, 'e>(
         s_0: pavex::request::path::RawPathParams<'a, 'b>,
         s_1: &'c pavex::request::RequestHead,
@@ -1503,7 +1351,7 @@ pub mod route_6 {
         v3: pavex::request::path::MatchedPathPattern,
         v4: &app::configuration::DatabaseConfig,
     ) -> pavex::response::Response {
-        let v5 = crate::route_6::Next0 {
+        let v5 = crate::route_5::Next0 {
             s_0: v0,
             s_1: v4,
             s_2: v1,
@@ -1524,7 +1372,7 @@ pub mod route_6 {
     ) -> pavex::response::Response {
         let v5 = pavex::telemetry::ServerRequestId::generate();
         let v6 = app::telemetry::root_span(v1, v3, v5);
-        let v7 = crate::route_6::Next1 {
+        let v7 = crate::route_5::Next1 {
             s_0: &v6,
             s_1: v0,
             s_2: v4,
@@ -1658,6 +1506,104 @@ pub mod route_6 {
         type IntoFuture = T;
         fn into_future(self) -> Self::IntoFuture {
             (self.next)(self.s_0, self.s_1, self.s_2, self.s_3, self.s_4)
+        }
+    }
+}
+pub mod route_6 {
+    pub async fn entrypoint<'a>(
+        s_0: pavex::request::path::MatchedPathPattern,
+        s_1: &'a pavex::request::RequestHead,
+    ) -> pavex::response::Response {
+        let response = wrapping_0(s_0, s_1).await;
+        response
+    }
+    async fn stage_1<'a>(
+        s_0: pavex::request::path::MatchedPathPattern,
+        s_1: &'a pavex::request::RequestHead,
+    ) -> pavex::response::Response {
+        let response = wrapping_1(s_0, s_1).await;
+        response
+    }
+    async fn stage_2<'a>(s_0: &'a pavex_tracing::RootSpan) -> pavex::response::Response {
+        let response = handler().await;
+        let response = post_processing_0(response, s_0).await;
+        response
+    }
+    async fn wrapping_0(
+        v0: pavex::request::path::MatchedPathPattern,
+        v1: &pavex::request::RequestHead,
+    ) -> pavex::response::Response {
+        let v2 = crate::route_6::Next0 {
+            s_0: v0,
+            s_1: v1,
+            next: stage_1,
+        };
+        let v3 = pavex::middleware::Next::new(v2);
+        let v4 = pavex::middleware::wrap_noop(v3).await;
+        <pavex::response::Response as pavex::response::IntoResponse>::into_response(v4)
+    }
+    async fn wrapping_1(
+        v0: pavex::request::path::MatchedPathPattern,
+        v1: &pavex::request::RequestHead,
+    ) -> pavex::response::Response {
+        let v2 = pavex::telemetry::ServerRequestId::generate();
+        let v3 = app::telemetry::root_span(v1, v0, v2);
+        let v4 = crate::route_6::Next1 {
+            s_0: &v3,
+            next: stage_2,
+        };
+        let v5 = pavex::middleware::Next::new(v4);
+        let v6 = <pavex_tracing::RootSpan as core::clone::Clone>::clone(&v3);
+        let v7 = pavex_tracing::logger(v6, v5).await;
+        <pavex::response::Response as pavex::response::IntoResponse>::into_response(v7)
+    }
+    async fn handler() -> pavex::response::Response {
+        let v0 = app::routes::health::check_health();
+        <http::StatusCode as pavex::response::IntoResponse>::into_response(v0)
+    }
+    async fn post_processing_0(
+        v0: pavex::response::Response,
+        v1: &pavex_tracing::RootSpan,
+    ) -> pavex::response::Response {
+        let v2 = app::telemetry::response_logger(v0, v1).await;
+        <pavex::response::Response as pavex::response::IntoResponse>::into_response(v2)
+    }
+    struct Next0<'a, T>
+    where
+        T: std::future::Future<Output = pavex::response::Response>,
+    {
+        s_0: pavex::request::path::MatchedPathPattern,
+        s_1: &'a pavex::request::RequestHead,
+        next: fn(
+            pavex::request::path::MatchedPathPattern,
+            &'a pavex::request::RequestHead,
+        ) -> T,
+    }
+    impl<'a, T> std::future::IntoFuture for Next0<'a, T>
+    where
+        T: std::future::Future<Output = pavex::response::Response>,
+    {
+        type Output = pavex::response::Response;
+        type IntoFuture = T;
+        fn into_future(self) -> Self::IntoFuture {
+            (self.next)(self.s_0, self.s_1)
+        }
+    }
+    struct Next1<'a, T>
+    where
+        T: std::future::Future<Output = pavex::response::Response>,
+    {
+        s_0: &'a pavex_tracing::RootSpan,
+        next: fn(&'a pavex_tracing::RootSpan) -> T,
+    }
+    impl<'a, T> std::future::IntoFuture for Next1<'a, T>
+    where
+        T: std::future::Future<Output = pavex::response::Response>,
+    {
+        type Output = pavex::response::Response;
+        type IntoFuture = T;
+        fn into_future(self) -> Self::IntoFuture {
+            (self.next)(self.s_0)
         }
     }
 }

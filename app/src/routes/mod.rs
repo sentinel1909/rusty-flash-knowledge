@@ -2,7 +2,7 @@
 
 // modules into scope
 pub mod flashcards;
-pub mod ping;
+pub mod health;
 
 // dependencies
 use pavex::blueprint::{
@@ -14,6 +14,7 @@ use pavex::f;
 // public routes, no API key required
 fn public_bp() -> Blueprint {
     let mut bp = Blueprint::new();
+    bp.route(GET, "/flashcards/health", f!(self::health::check_health));
     bp.route(
         GET,
         "/flashcards/random",
@@ -29,7 +30,7 @@ fn api_bp() -> Blueprint {
     let mut bp = Blueprint::new();
     bp.pre_process(f!(crate::middleware::validate_api_key))
         .error_handler(f!(crate::errors::api_error2response));
-    bp.route(GET, "/ping", f!(self::ping::get));
+
     bp.route(
         GET,
         "/flashcards",

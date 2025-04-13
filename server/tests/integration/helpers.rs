@@ -151,15 +151,6 @@ impl TestApi {
             .expect("Failed to execute request.")
     }
 
-    pub async fn get_ping(&self) -> reqwest::Response {
-        self.api_client
-            .get(format!("{}/v1/ping", &self.api_address))
-            .headers(self.set_headers().await)
-            .send()
-            .await
-            .expect("Failed to execute request.")
-    }
-
     pub async fn get_flashcards(&self) -> reqwest::Response {
         self.api_client
             .get(format!("{}/v1/flashcards", &self.api_address))
