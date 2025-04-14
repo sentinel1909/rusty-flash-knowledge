@@ -1,106 +1,82 @@
 // app/src/errors.rs
 
 // dependencies
+use pavex::response::Response;
 use pavex::{http::StatusCode, response::body::errors::JsonSerializationError};
+use serde::Serialize;
+use serde_json;
+use thiserror::Error;
 
-// error type to represent possible API failure variants
-#[derive(Debug)]
+#[derive(Debug, Error)]
 pub enum ApiError {
-    ValidationError(FlashcardValidationError),
-    SerializationError(JsonSerializationError),
-    UuidError(uuid::Error),
-    DatabaseError(sqlx::Error),
+    #[error("Invalid API key")]
     ApiKeyError,
-    NotFound(String),
+
+    #[error("Questions must be unique: {0}")]
     DuplicateQuestion(String),
+
+    #[error("Not found: {0}")]
+    NotFound(String),
+
+    #[error("Error serializing response data: {0}")]
+    SerializationError(#[from] JsonSerializationError),
+
+    #[error("Database error: {0}")]
+    DatabaseError(#[from] sqlx::Error),
+
+    #[error("Uuid parsing error: {0}")]
+    UuidError(#[from] uuid::Error),
+
+    #[error("Error validating incoming data: {0}")]
+    ValidationError(#[from] FlashcardValidationError),
 }
 
-// error type to represent possible data validation failure variants
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Error)]
 pub enum FlashcardValidationError {
+    #[error("Question field cannot be empty.")]
     EmptyQuestion,
+
+    #[error("Answer field cannot be empty.")]
     EmptyAnswer,
+
+    #[error("Topic field cannot be empty.")]
     EmptyTopic,
+
+    #[error("Tags field cannot be empty.")]
     EmptyTags,
+
+    #[error("Invalid difficulty level. Difficulty must be between 1 and 5")]
     InvalidDifficulty,
 }
 
-// implement the From trait to convert from a FlashcardValidationError to an ApiError
-impl From<FlashcardValidationError> for ApiError {
-    fn from(err: FlashcardValidationError) -> Self {
-        ApiError::ValidationError(err)
-    }
-}
-
-// implement the From trait to convert from a JsonSerializationError to an ApiError
-impl From<JsonSerializationError> for ApiError {
-    fn from(err: JsonSerializationError) -> Self {
-        ApiError::SerializationError(err)
-    }
-}
-
-// implement the From trait to convert from a DatabaseError to an ApiError
-impl From<sqlx::Error> for ApiError {
-    fn from(err: sqlx::Error) -> Self {
-        ApiError::DatabaseError(err)
-    }
-}
-
-// implement the From trait to convert from a DatabaseError to an ApiError
-impl From<uuid::Error> for ApiError {
-    fn from(err: uuid::Error) -> Self {
-        ApiError::UuidError(err)
-    }
+#[derive(Serialize)]
+struct ErrorResponse {
+    msg: String,
+    status: u16,
+    details: String,
 }
 
 // error handler for the static server endpoint
-pub fn api_error2response(e: &ApiError) -> StatusCode {
-    match e {
-        ApiError::ValidationError(_) => StatusCode::BAD_REQUEST,
-        ApiError::SerializationError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-        ApiError::DatabaseError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-        ApiError::UuidError(_) => StatusCode::BAD_REQUEST,
+pub fn api_error2response(error: &ApiError) -> Response {
+    let status = match error {
         ApiError::ApiKeyError => StatusCode::UNAUTHORIZED,
-        ApiError::NotFound(_) => StatusCode::NOT_FOUND,
         ApiError::DuplicateQuestion(_) => StatusCode::CONFLICT,
-    }
-}
+        ApiError::DatabaseError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+        ApiError::NotFound(_) => StatusCode::NOT_FOUND,
+        ApiError::SerializationError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+        ApiError::UuidError(_) => StatusCode::BAD_REQUEST,
+        ApiError::ValidationError(_) => StatusCode::BAD_REQUEST,
+    };
 
-// implement the Error trait for the ApiError type
-impl std::error::Error for ApiError {}
+    let payload = ErrorResponse {
+        msg: "Error".to_string(),
+        status: status.as_u16(),
+        details: error.to_string(),
+    };
 
-// implement the Display trait for the ApiError type
-impl std::fmt::Display for ApiError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::ValidationError(err) => write!(f, "Error validating incoming data: {}", err),
-            Self::SerializationError(err) => {
-                write!(f, "Error serializing response data: {}", err)
-            }
-            Self::DatabaseError(err) => write!(f, "Database error: {}", err),
-            Self::UuidError(err) => write!(f, "Uuid parsing error: {}", err),
-            Self::ApiKeyError => write!(f, "Invalid API key"),
-            Self::NotFound(err) => write!(f, "Not found: {}", err),
-            Self::DuplicateQuestion(err) => write!(f, "Questions must be unique: {}", err),
-        }
-    }
-}
+    let json = serde_json::to_string(&payload).unwrap_or_else(|_| {
+        r#"{"msg":"Error","status":500,"details":"Internal server error formatting error response"}"#.to_string()
+    });
 
-// implement the Error trait for the FlashcardValidationError type
-impl std::error::Error for FlashcardValidationError {}
-
-// implement the Display trait for the FlashcardValidationError type
-impl std::fmt::Display for FlashcardValidationError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::EmptyQuestion => write!(f, "Question field cannot be empty."),
-            Self::EmptyAnswer => write!(f, "Answer field cannot be empty."),
-            Self::EmptyTopic => write!(f, "Topic field cannot be empty."),
-            Self::EmptyTags => write!(f, "Tags field cannot be empty."),
-            Self::InvalidDifficulty => write!(
-                f,
-                "Invalid difficulty level. Difficulty must be between 1 and 5"
-            ),
-        }
-    }
+    Response::new(status).set_typed_body(json)
 }

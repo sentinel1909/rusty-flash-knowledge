@@ -613,7 +613,7 @@ pub mod route_1 {
                     let v6 = pavex::Error::new(v4);
                     let v7 = {
                         app::telemetry::error_logger(&v6, v1).await;
-                        <http::StatusCode as pavex::response::IntoResponse>::into_response(
+                        <pavex::response::Response as pavex::response::IntoResponse>::into_response(
                             v5,
                         )
                     };
@@ -670,7 +670,7 @@ pub mod route_1 {
                     let v11 = app::api_error2response(&v10);
                     let v12 = pavex::Error::new(v10);
                     app::telemetry::error_logger(&v12, v1).await;
-                    <http::StatusCode as pavex::response::IntoResponse>::into_response(
+                    <pavex::response::Response as pavex::response::IntoResponse>::into_response(
                         v11,
                     )
                 };
@@ -840,7 +840,7 @@ pub mod route_2 {
                     let v6 = pavex::Error::new(v4);
                     let v7 = {
                         app::telemetry::error_logger(&v6, v1).await;
-                        <http::StatusCode as pavex::response::IntoResponse>::into_response(
+                        <pavex::response::Response as pavex::response::IntoResponse>::into_response(
                             v5,
                         )
                     };
@@ -914,7 +914,7 @@ pub mod route_2 {
                     let v14 = app::api_error2response(&v13);
                     let v15 = pavex::Error::new(v13);
                     app::telemetry::error_logger(&v15, v2).await;
-                    <http::StatusCode as pavex::response::IntoResponse>::into_response(
+                    <pavex::response::Response as pavex::response::IntoResponse>::into_response(
                         v14,
                     )
                 };
@@ -1082,7 +1082,7 @@ pub mod route_3 {
                     let v6 = pavex::Error::new(v4);
                     let v7 = {
                         app::telemetry::error_logger(&v6, v1).await;
-                        <http::StatusCode as pavex::response::IntoResponse>::into_response(
+                        <pavex::response::Response as pavex::response::IntoResponse>::into_response(
                             v5,
                         )
                     };
@@ -1121,7 +1121,7 @@ pub mod route_3 {
                     let v7 = app::api_error2response(&v6);
                     let v8 = pavex::Error::new(v6);
                     app::telemetry::error_logger(&v8, v0).await;
-                    <http::StatusCode as pavex::response::IntoResponse>::into_response(
+                    <pavex::response::Response as pavex::response::IntoResponse>::into_response(
                         v7,
                     )
                 };
@@ -1367,7 +1367,7 @@ pub mod route_5 {
                     let v4 = app::api_error2response(&v3);
                     let v5 = pavex::Error::new(v3);
                     app::telemetry::error_logger(&v5, v0).await;
-                    <http::StatusCode as pavex::response::IntoResponse>::into_response(
+                    <pavex::response::Response as pavex::response::IntoResponse>::into_response(
                         v4,
                     )
                 };
@@ -1503,7 +1503,7 @@ pub mod route_6 {
                     let v4 = app::api_error2response(&v3);
                     let v5 = pavex::Error::new(v3);
                     app::telemetry::error_logger(&v5, v0).await;
-                    <http::StatusCode as pavex::response::IntoResponse>::into_response(
+                    <pavex::response::Response as pavex::response::IntoResponse>::into_response(
                         v4,
                     )
                 };
@@ -1663,7 +1663,7 @@ pub mod route_7 {
                     let v7 = app::api_error2response(&v6);
                     let v8 = pavex::Error::new(v6);
                     app::telemetry::error_logger(&v8, v0).await;
-                    <http::StatusCode as pavex::response::IntoResponse>::into_response(
+                    <pavex::response::Response as pavex::response::IntoResponse>::into_response(
                         v7,
                     )
                 };
