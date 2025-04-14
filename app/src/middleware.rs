@@ -3,10 +3,12 @@
 // dependencies
 use crate::configuration::AuthConfig;
 use crate::errors::ApiError;
+use pavex::http::HeaderValue;
 use pavex::middleware::Processing;
 use pavex::request::RequestHead;
+use pavex::response::Response;
 
-// function which tests the validity of the API key, contained in Authorization: Bearer, in the request header
+// pre-processing middleware function  which tests the validity of the API key, contained in Authorization: Bearer, in the request header
 pub async fn validate_api_key(
     auth_config: &AuthConfig,
     request: &RequestHead,
@@ -23,4 +25,21 @@ pub async fn validate_api_key(
     }
 
     Ok(Processing::Continue)
+}
+
+pub fn add_cors_headers(response: Response) -> Response {
+    let mut response = response;
+
+    let headers = response.headers_mut();
+    headers.insert("Access-Control-Allow-Origin", HeaderValue::from_static("*"));
+    headers.insert(
+        "Access-Control-Allow-Methods",
+        HeaderValue::from_static("GET, POST, PUT, DELETE, OPTIONS"),
+    );
+    headers.insert(
+        "Access-Control-Allow-Headers",
+        HeaderValue::from_static("Content-Type, Authorization"),
+    );
+
+    response
 }

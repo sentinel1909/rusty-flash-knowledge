@@ -127,16 +127,16 @@ impl TestApi {
         headers
     }
 
-    pub async fn get_no_api_key(&self) -> reqwest::Response {
+    pub async fn post_no_api_key(&self) -> reqwest::Response {
         self.api_client
-            .get(format!("{}/v1/flashcards", &self.api_address))
+            .post(format!("{}/v1/flashcards", &self.api_address))
             .header(HOST, "api.rusty-flash-knowledge.net")
             .send()
             .await
             .expect("Failed to execute request.")
     }
 
-    pub async fn get_invalid_api_key(&self) -> reqwest::Response {
+    pub async fn post_invalid_api_key(&self) -> reqwest::Response {
         let mut headers = HeaderMap::new();
         headers.insert(
             HOST,
@@ -144,7 +144,7 @@ impl TestApi {
         );
         headers.insert(AUTHORIZATION, HeaderValue::from_static("the-wrong-api-key"));
         self.api_client
-            .get(format!("{}/v1/flashcards", &self.api_address))
+            .post(format!("{}/v1/flashcards", &self.api_address))
             .headers(headers)
             .send()
             .await
@@ -153,8 +153,8 @@ impl TestApi {
 
     pub async fn get_flashcards(&self) -> reqwest::Response {
         self.api_client
-            .get(format!("{}/v1/flashcards", &self.api_address))
-            .headers(self.set_headers().await)
+            .get(format!("{}/flashcards", &self.api_address))
+            .header(HOST, "rusty-flash-knowledge.net")
             .send()
             .await
             .expect("Failed to execute request.")
@@ -162,8 +162,8 @@ impl TestApi {
 
     pub async fn get_flashcard(&self, id: String) -> reqwest::Response {
         self.api_client
-            .get(format!("{}/v1/flashcards/{}", &self.api_address, id))
-            .headers(self.set_headers().await)
+            .get(format!("{}/flashcards/{}", &self.api_address, id))
+            .header(HOST, "rusty-flash-knowledge.net")
             .send()
             .await
             .expect("Failed to execute request.")
