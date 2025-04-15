@@ -1,6 +1,6 @@
 [package]
 name = "server_sdk"
-workspace = "0.17.0"
+version.workspace = true
 edition = "2024"
 
 [package.metadata.px.generate]
