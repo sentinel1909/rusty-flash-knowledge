@@ -17,6 +17,24 @@ pub async fn list_flashcards(pool: PgPool) -> Result<Vec<FlashCard>, sqlx::Error
     Ok(flash_cards)
 }
 
+// function which queries the database and returns all the flash cards filtered by topic
+pub async fn list_flashcards_by_topic(
+    pool: PgPool,
+    topic: &str,
+) -> Result<Vec<FlashCard>, sqlx::Error> {
+    let flash_cards: Vec<FlashCard> = sqlx::query_as(
+        "SELECT *
+            FROM flashcards
+            WHERE topic ILIKE $1
+            ORDER BY created_at DESC;",
+    )
+    .bind(topic)
+    .fetch_all(&pool)
+    .await?;
+
+    Ok(flash_cards)
+}
+
 // function which queries the database and returns a single flash card give an id
 pub async fn list_flashcard(pool: PgPool, id: Uuid) -> Result<FlashCard, sqlx::Error> {
     let flash_card = sqlx::query_as("SELECT * FROM flashcards WHERE id = $1;")

@@ -5,11 +5,12 @@ use crate::configuration::DatabaseConfig;
 use crate::errors::ApiError;
 use crate::models::{FlashCard, NewFlashCard, UpdatedFlashCard};
 use crate::queries::{
-    create_flashcard, delete_flashcard, list_flashcard, list_flashcards, random_flashcard,
-    update_flashcard,
+    create_flashcard, delete_flashcard, list_flashcard, list_flashcards, list_flashcards_by_topic,
+    random_flashcard, update_flashcard,
 };
 use pavex::request::body::JsonBody;
 use pavex::request::path::PathParams;
+use pavex::request::query::QueryParams;
 use pavex::response::{Response, body::Json};
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgDatabaseError;
@@ -21,12 +22,19 @@ pub struct FlashCardParams {
     pub id: String,
 }
 
+// struct type to represent the query parameters of an incoming request
+#[derive(Deserialize)]
+pub struct TopicParams {
+    pub topic: Option<String>,
+}
+
 // struct type to represent the data for a flash card
 #[derive(Debug, Deserialize, PartialEq, Serialize)]
 pub struct FlashCardContent {
     pub id: Uuid,
     pub question: String,
     pub answer: String,
+    pub topic: String,
 }
 
 // implement the From trait to convert the FlashCard type into a FlashCardResponse type
@@ -36,6 +44,7 @@ impl From<FlashCard> for FlashCardContent {
             id: card.id,
             question: card.question,
             answer: card.answer,
+            topic: card.topic,
         }
     }
 }
@@ -48,9 +57,17 @@ pub struct FlashCardResponse {
 }
 
 // handler which lists all the flash cards in the database
-pub async fn list_flashcards_handler(db: &DatabaseConfig) -> Result<Response, ApiError> {
+pub async fn list_flashcards_handler(
+    db: &DatabaseConfig,
+    params: &QueryParams<TopicParams>,
+) -> Result<Response, ApiError> {
     let pool = db.get_pool().await;
-    let flash_cards = list_flashcards(pool).await?;
+
+    let flash_cards = match &params.0.topic {
+        Some(topic) => list_flashcards_by_topic(pool, &topic).await?,
+        None => list_flashcards(pool).await?,
+    };
+
     let response_body: Vec<FlashCardResponse> = flash_cards
         .into_iter()
         .map(|flash_card| FlashCardResponse {

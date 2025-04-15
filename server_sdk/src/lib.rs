@@ -276,9 +276,9 @@ impl Router {
                             "/flashcards",
                         );
                         route_6::entrypoint(
-                                &request_head,
-                                matched_route_template,
                                 &state.database_config,
+                                matched_route_template,
+                                &request_head,
                             )
                             .await
                     }
@@ -1435,34 +1435,35 @@ pub mod route_5 {
 }
 pub mod route_6 {
     pub async fn entrypoint<'a, 'b>(
-        s_0: &'a pavex::request::RequestHead,
+        s_0: &'a app::configuration::DatabaseConfig,
         s_1: pavex::request::path::MatchedPathPattern,
-        s_2: &'b app::configuration::DatabaseConfig,
+        s_2: &'b pavex::request::RequestHead,
     ) -> pavex::response::Response {
         let response = wrapping_0(s_0, s_1, s_2).await;
         response
     }
     async fn stage_1<'a, 'b>(
-        s_0: &'a app::configuration::DatabaseConfig,
-        s_1: &'b pavex::request::RequestHead,
+        s_0: &'a pavex::request::RequestHead,
+        s_1: &'b app::configuration::DatabaseConfig,
         s_2: pavex::request::path::MatchedPathPattern,
     ) -> pavex::response::Response {
         let response = wrapping_1(s_1, s_2, s_0).await;
         response
     }
-    async fn stage_2<'a, 'b>(
+    async fn stage_2<'a, 'b, 'c>(
         s_0: &'a pavex_tracing::RootSpan,
-        s_1: &'b app::configuration::DatabaseConfig,
+        s_1: &'b pavex::request::RequestHead,
+        s_2: &'c app::configuration::DatabaseConfig,
     ) -> pavex::response::Response {
-        let response = handler(s_0, s_1).await;
+        let response = handler(s_1, s_0, s_2).await;
         let response = post_processing_0(response, s_0).await;
         let response = post_processing_1(response).await;
         response
     }
     async fn wrapping_0(
-        v0: &pavex::request::RequestHead,
+        v0: &app::configuration::DatabaseConfig,
         v1: pavex::request::path::MatchedPathPattern,
-        v2: &app::configuration::DatabaseConfig,
+        v2: &pavex::request::RequestHead,
     ) -> pavex::response::Response {
         let v3 = crate::route_6::Next0 {
             s_0: v2,
@@ -1475,15 +1476,16 @@ pub mod route_6 {
         <pavex::response::Response as pavex::response::IntoResponse>::into_response(v5)
     }
     async fn wrapping_1(
-        v0: &pavex::request::RequestHead,
+        v0: &app::configuration::DatabaseConfig,
         v1: pavex::request::path::MatchedPathPattern,
-        v2: &app::configuration::DatabaseConfig,
+        v2: &pavex::request::RequestHead,
     ) -> pavex::response::Response {
         let v3 = pavex::telemetry::ServerRequestId::generate();
-        let v4 = app::telemetry::root_span(v0, v1, v3);
+        let v4 = app::telemetry::root_span(v2, v1, v3);
         let v5 = crate::route_6::Next1 {
             s_0: &v4,
             s_1: v2,
+            s_2: v0,
             next: stage_2,
         };
         let v6 = pavex::middleware::Next::new(v5);
@@ -1492,24 +1494,41 @@ pub mod route_6 {
         <pavex::response::Response as pavex::response::IntoResponse>::into_response(v8)
     }
     async fn handler(
-        v0: &pavex_tracing::RootSpan,
-        v1: &app::configuration::DatabaseConfig,
+        v0: &pavex::request::RequestHead,
+        v1: &pavex_tracing::RootSpan,
+        v2: &app::configuration::DatabaseConfig,
     ) -> pavex::response::Response {
-        let v2 = app::routes::flashcards::list_flashcards_handler(v1).await;
-        let v3 = match v2 {
+        let v3 = pavex::request::query::QueryParams::extract(v0);
+        let v4 = match v3 {
             Ok(ok) => ok,
-            Err(v3) => {
+            Err(v4) => {
                 return {
-                    let v4 = app::api_error2response(&v3);
-                    let v5 = pavex::Error::new(v3);
-                    app::telemetry::error_logger(&v5, v0).await;
+                    let v5 = pavex::request::query::errors::ExtractQueryParamsError::into_response(
+                        &v4,
+                    );
+                    let v6 = pavex::Error::new(v4);
+                    app::telemetry::error_logger(&v6, v1).await;
                     <pavex::response::Response as pavex::response::IntoResponse>::into_response(
-                        v4,
+                        v5,
                     )
                 };
             }
         };
-        <pavex::response::Response as pavex::response::IntoResponse>::into_response(v3)
+        let v5 = app::routes::flashcards::list_flashcards_handler(v2, &v4).await;
+        let v6 = match v5 {
+            Ok(ok) => ok,
+            Err(v6) => {
+                return {
+                    let v7 = app::api_error2response(&v6);
+                    let v8 = pavex::Error::new(v6);
+                    app::telemetry::error_logger(&v8, v1).await;
+                    <pavex::response::Response as pavex::response::IntoResponse>::into_response(
+                        v7,
+                    )
+                };
+            }
+        };
+        <pavex::response::Response as pavex::response::IntoResponse>::into_response(v6)
     }
     async fn post_processing_0(
         v0: pavex::response::Response,
@@ -1528,12 +1547,12 @@ pub mod route_6 {
     where
         T: std::future::Future<Output = pavex::response::Response>,
     {
-        s_0: &'a app::configuration::DatabaseConfig,
-        s_1: &'b pavex::request::RequestHead,
+        s_0: &'a pavex::request::RequestHead,
+        s_1: &'b app::configuration::DatabaseConfig,
         s_2: pavex::request::path::MatchedPathPattern,
         next: fn(
-            &'a app::configuration::DatabaseConfig,
-            &'b pavex::request::RequestHead,
+            &'a pavex::request::RequestHead,
+            &'b app::configuration::DatabaseConfig,
             pavex::request::path::MatchedPathPattern,
         ) -> T,
     }
@@ -1547,25 +1566,27 @@ pub mod route_6 {
             (self.next)(self.s_0, self.s_1, self.s_2)
         }
     }
-    struct Next1<'a, 'b, T>
+    struct Next1<'a, 'b, 'c, T>
     where
         T: std::future::Future<Output = pavex::response::Response>,
     {
         s_0: &'a pavex_tracing::RootSpan,
-        s_1: &'b app::configuration::DatabaseConfig,
+        s_1: &'b pavex::request::RequestHead,
+        s_2: &'c app::configuration::DatabaseConfig,
         next: fn(
             &'a pavex_tracing::RootSpan,
-            &'b app::configuration::DatabaseConfig,
+            &'b pavex::request::RequestHead,
+            &'c app::configuration::DatabaseConfig,
         ) -> T,
     }
-    impl<'a, 'b, T> std::future::IntoFuture for Next1<'a, 'b, T>
+    impl<'a, 'b, 'c, T> std::future::IntoFuture for Next1<'a, 'b, 'c, T>
     where
         T: std::future::Future<Output = pavex::response::Response>,
     {
         type Output = pavex::response::Response;
         type IntoFuture = T;
         fn into_future(self) -> Self::IntoFuture {
-            (self.next)(self.s_0, self.s_1)
+            (self.next)(self.s_0, self.s_1, self.s_2)
         }
     }
 }

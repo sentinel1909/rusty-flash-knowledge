@@ -7,7 +7,7 @@ use pavex::time::Timestamp as PavexTimestamp;
 use uuid::Uuid;
 
 #[tokio::test]
-async fn list_single_flashcard_works() {
+async fn list_single_flashcard_returns_200_ok_and_flash_card() {
     // Arrange
     let api = TestApi::spawn().await;
     let flash_card = FlashCard {
