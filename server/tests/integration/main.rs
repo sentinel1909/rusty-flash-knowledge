@@ -4,6 +4,7 @@ mod health_check;
 mod helpers;
 mod list_flashcard;
 mod list_flashcards;
+mod list_flashcards_topic;
 mod middleware;
 mod random_flashcard;
 mod update_flashcard;

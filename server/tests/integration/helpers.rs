@@ -160,6 +160,19 @@ impl TestApi {
             .expect("Failed to execute request.")
     }
 
+    pub async fn get_flashcards_by_topic(&self, query: Option<&str>) -> reqwest::Response {
+        let url = match query {
+            Some(topic) => format!("{}/flashcards?topic={}", &self.api_address, topic),
+            None => format!("{}/flashcards", &self.api_address),
+        };
+        self.api_client
+            .get(url)
+            .header(HOST, "rusty-flash-knowledge.net")
+            .send()
+            .await
+            .expect("Failed to execute request.")
+    }
+
     pub async fn get_flashcard(&self, id: String) -> reqwest::Response {
         self.api_client
             .get(format!("{}/flashcards/{}", &self.api_address, id))
