@@ -1,3 +1,6 @@
+// app/src/telemetry.rs
+
+// dependencies
 use pavex::blueprint::Blueprint;
 use pavex::f;
 use pavex::request::RequestHead;

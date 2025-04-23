@@ -1,3 +1,6 @@
+// app/src/configuration.rs
+
+// dependencies
 use pavex::blueprint::Blueprint;
 use pavex::server::IncomingStream;
 use pavex::t;
@@ -16,6 +19,7 @@ pub fn register(bp: &mut Blueprint) {
     bp.config("authorization", t!(self::AuthConfig));
 }
 
+// struct type to represent server configuration
 #[derive(serde::Deserialize, Debug, Clone)]
 /// Configuration for the HTTP server used to expose our API
 /// to users.
@@ -41,6 +45,7 @@ pub struct ServerConfig {
     pub graceful_shutdown_timeout: std::time::Duration,
 }
 
+// function to aid in shutdown configuration
 fn deserialize_shutdown<'de, D>(deserializer: D) -> Result<std::time::Duration, D::Error>
 where
     D: serde::Deserializer<'de>,
@@ -55,6 +60,7 @@ where
     }
 }
 
+// methods for the server config struct type
 impl ServerConfig {
     /// Bind a TCP listener according to the specified parameters.
     pub async fn listener(&self) -> Result<IncomingStream, std::io::Error> {

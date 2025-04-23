@@ -40,7 +40,7 @@ impl TryFrom<NewFlashCard> for FlashCard {
             return Err(FlashcardValidationError::EmptyTopic);
         }
 
-        if new.tags.len() == 0 {
+        if new.tags.is_empty() {
             return Err(FlashcardValidationError::EmptyTags);
         }
 

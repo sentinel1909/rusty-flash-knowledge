@@ -27,6 +27,7 @@ pub async fn validate_api_key(
     Ok(Processing::Continue)
 }
 
+// post-processing function to add CORS related headers
 pub fn add_cors_headers(response: Response) -> Response {
     let mut response = response;
 

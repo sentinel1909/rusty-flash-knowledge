@@ -1,3 +1,6 @@
+// app/blueprint.rs
+
+// dependencies
 use crate::{configuration, routes, telemetry};
 use pavex::blueprint::Blueprint;
 use pavex::kit::ApiKit;

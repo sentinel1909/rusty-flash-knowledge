@@ -79,6 +79,7 @@ fn api_bp() -> Blueprint {
     bp
 }
 
+// combine the public and private routes and register them
 pub fn register(bp: &mut Blueprint) {
     bp.domain("rusty-flash-knowledge.net").nest(public_bp());
     bp.domain("api.rusty-flash-knowledge.net")

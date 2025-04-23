@@ -64,7 +64,7 @@ pub async fn list_flashcards_handler(
     let pool = db.get_pool().await;
 
     let flash_cards = match &params.0.topic {
-        Some(topic) => list_flashcards_by_topic(pool, &topic).await?,
+        Some(topic) => list_flashcards_by_topic(pool, topic).await?,
         None => list_flashcards(pool).await?,
     };
 

@@ -1,3 +1,6 @@
+// app/src/bp.rs
+
+// dependencies
 use app::blueprint;
 use cargo_px_env::generated_pkg_manifest_path;
 use pavex_cli_client::Client;

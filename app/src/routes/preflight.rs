@@ -1,6 +1,10 @@
+// app/src/routes/preflight.rs
+
+// dependencies
 use pavex::http::HeaderValue;
 use pavex::response::Response;
 
+// handler function to add CORS related headers for public routes
 pub fn preflight_handler() -> Response {
     let mut response = Response::no_content();
 
