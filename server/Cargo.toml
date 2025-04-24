@@ -35,5 +35,6 @@ workspace_hack = { path = "../workspace_hack" }
 [dev-dependencies]
 jiff-sqlx = { version = "0.1.1", features = ["postgres"] }
 reqwest = "0.12"
+serde = { version = "1", features = [ "derive" ] }
 sqlx = { version = "0.8.3", features = [ "runtime-tokio", "tls-rustls", "migrate", "uuid", "macros", "chrono", "postgres" ] }
 uuid = { version = "1.16.0", features = ["v4", "serde" ] }

@@ -45,6 +45,19 @@ pub async fn list_flashcard(pool: PgPool, id: Uuid) -> Result<FlashCard, sqlx::E
     Ok(flash_card)
 }
 
+// function which queries the database and returns a list of available topics
+pub async fn list_topics(pool: PgPool) -> Result<Vec<String>, sqlx::Error> {
+    let topics: Vec<String> = sqlx::query_scalar(
+        "SELECT DISTINCT topic
+        FROM flashcards
+        ORDER BY topic ASC",
+    )
+    .fetch_all(&pool)
+    .await?;
+
+    Ok(topics)
+}
+
 // function which queries the database and returns all the flash cards
 pub async fn create_flashcard(
     pool: PgPool,
