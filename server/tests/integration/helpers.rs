@@ -1,3 +1,6 @@
+// server/tests/api/helpers.rs
+
+// dependencies
 use app::{UpdatedFlashCard, models::NewFlashCard};
 use pavex::{
     config::ConfigLoader,
@@ -167,6 +170,15 @@ impl TestApi {
         };
         self.api_client
             .get(url)
+            .header(HOST, "rusty-flash-knowledge.net")
+            .send()
+            .await
+            .expect("Failed to execute request.")
+    }
+
+    pub async fn get_all_topics(&self) -> reqwest::Response {
+        self.api_client
+            .get(format!("{}/flashcards/topics", &self.api_address))
             .header(HOST, "rusty-flash-knowledge.net")
             .send()
             .await
