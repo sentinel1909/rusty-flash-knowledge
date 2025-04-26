@@ -2,6 +2,7 @@ mod create_flashcard;
 mod delete_flashcard;
 mod health_check;
 mod helpers;
+mod list_all_tags;
 mod list_all_topics;
 mod list_flashcard;
 mod list_flashcards;

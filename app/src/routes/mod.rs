@@ -25,6 +25,12 @@ fn public_bp() -> Blueprint {
     .error_handler(f!(crate::errors::api_error2response));
     bp.route(
         GET,
+        "/flashcards/tags",
+        f!(self::flashcards::list_flashcard_tags_handler),
+    )
+    .error_handler(f!(crate::api_error2response));
+    bp.route(
+        GET,
         "/flashcards/topics",
         f!(self::flashcards::list_flashcard_topics_handler),
     )

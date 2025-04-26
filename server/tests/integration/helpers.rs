@@ -176,6 +176,15 @@ impl TestApi {
             .expect("Failed to execute request.")
     }
 
+    pub async fn get_all_tags(&self) -> reqwest::Response {
+        self.api_client
+            .get(format!("{}/flashcards/tags", &self.api_address))
+            .header(HOST, "rusty-flash-knowledge.net")
+            .send()
+            .await
+            .expect("Failed to execute request.")
+    }
+
     pub async fn get_all_topics(&self) -> reqwest::Response {
         self.api_client
             .get(format!("{}/flashcards/topics", &self.api_address))

@@ -45,6 +45,20 @@ pub async fn list_flashcard(pool: PgPool, id: Uuid) -> Result<FlashCard, sqlx::E
     Ok(flash_card)
 }
 
+// function which queries the database and returns a list of available tags
+pub async fn list_tags(pool: PgPool) -> Result<Vec<String>, sqlx::Error> {
+    let tags: Vec<String> = sqlx::query_scalar(
+        "SELECT DISTINCT UNNEST(tags) AS tag
+FROM flashcards
+WHERE tags IS NOT NULL
+ORDER BY tag ASC;",
+    )
+    .fetch_all(&pool)
+    .await?;
+
+    Ok(tags)
+}
+
 // function which queries the database and returns a list of available topics
 pub async fn list_topics(pool: PgPool) -> Result<Vec<String>, sqlx::Error> {
     let topics: Vec<String> = sqlx::query_scalar(
