@@ -5,7 +5,7 @@ use crate::configuration::DatabaseConfig;
 use crate::errors::ApiError;
 use crate::models::{FlashCard, NewFlashCard, UpdatedFlashCard};
 use crate::queries::{
-    create_flashcard, delete_flashcard, list_flashcard, list_flashcards, list_flashcards_by_topic,
+    create_flashcard, delete_flashcard, list_flashcard, list_flashcards, list_flashcards_by_topic, list_flashcards_by_tag,
     list_tags, list_topics, random_flashcard, update_flashcard,
 };
 use pavex::request::body::JsonBody;
@@ -24,8 +24,9 @@ pub struct FlashCardParams {
 
 // struct type to represent the query parameters of an incoming request
 #[derive(Deserialize)]
-pub struct TopicParams {
+pub struct SearchParams {
     pub topic: Option<String>,
+    pub tag: Option<String>,
 }
 
 // struct type to represent the data for a flash card
@@ -70,16 +71,20 @@ pub struct TopicsResponse {
     pub content: Vec<String>,
 }
 
-// handler which lists all the flash cards in the database
+// handler which lists all the flash cards in the database; accepts query parameters
+// either topic or tag and returns the appropriate results
 pub async fn list_flashcards_handler(
     db: &DatabaseConfig,
-    params: &QueryParams<TopicParams>,
+    params: &QueryParams<SearchParams>,
 ) -> Result<Response, ApiError> {
     let pool = db.get_pool().await;
 
     let flash_cards = match &params.0.topic {
         Some(topic) => list_flashcards_by_topic(pool, topic).await?,
-        None => list_flashcards(pool).await?,
+        None => match &params.0.tag {
+            Some(tag) => list_flashcards_by_tag(pool, tag).await?,
+            None => list_flashcards(pool).await?,
+        }
     };
 
     let response_body: Vec<FlashCardResponse> = flash_cards
