@@ -6,7 +6,7 @@ use crate::errors::ApiError;
 use crate::models::{FlashCard, NewFlashCard, UpdatedFlashCard};
 use crate::queries::{
     create_flashcard, delete_flashcard, list_flashcard, list_flashcards, list_flashcards_by_topic,
-    list_topics, random_flashcard, update_flashcard,
+    list_tags, list_topics, random_flashcard, update_flashcard,
 };
 use pavex::request::body::JsonBody;
 use pavex::request::path::PathParams;
@@ -58,6 +58,13 @@ pub struct FlashCardResponse {
 
 // struct type to represent a response wrapping the list of topics
 #[derive(Debug, Deserialize, PartialEq, Serialize)]
+pub struct TagsResponse {
+    pub msg: String,
+    pub content: Vec<String>,
+}
+
+// struct type to represent a response wrapping the list of topics
+#[derive(Debug, Deserialize, PartialEq, Serialize)]
 pub struct TopicsResponse {
     pub msg: String,
     pub content: Vec<String>,
@@ -99,6 +106,22 @@ pub async fn list_flashcard_handler(
         content: FlashCardContent::from(flash_card),
     };
     let json = Json::new(response_body)?;
+    Ok(Response::ok().set_typed_body(json))
+}
+
+// handler which retrieves a list of flash card tags from the database
+pub async fn list_flashcard_tags_handler(db: &DatabaseConfig) -> Result<Response, ApiError> {
+    let pool = db.get_pool().await;
+
+    let tags: Vec<String> = list_tags(pool).await?;
+
+    let response_body: TagsResponse = TagsResponse {
+        msg: "success".to_string(),
+        content: tags,
+    };
+
+    let json = Json::new(response_body)?;
+
     Ok(Response::ok().set_typed_body(json))
 }
 

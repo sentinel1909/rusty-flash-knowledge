@@ -1,4 +1,4 @@
-// server/tests/integration/list_all_topics.rs
+// server/tests/integration/list_all_tags.rs
 
 // dependencies
 use crate::helpers::TestApi;
@@ -7,13 +7,13 @@ use pavex::http::StatusCode;
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
-struct TopicsResponse {
+struct TagsResponse {
     msg: String,
     content: Vec<String>,
 }
 
 #[tokio::test]
-async fn list_all_topics_returns_200_ok() {
+async fn list_all_tags_returns_200_ok() {
     // Arrange
     let api = TestApi::spawn().await;
 
@@ -46,16 +46,21 @@ async fn list_all_topics_returns_200_ok() {
     api.create_flashcard(&card_3).await;
 
     // Act
-    let response = api.get_all_topics().await;
+    let response = api.get_all_tags().await;
     println!("{:?}", response);
 
     // Assert
     assert_eq!(response.status(), StatusCode::OK);
 
-    let TopicsResponse { msg, content } = response.json().await.unwrap();
+    let TagsResponse { msg, content } = response.json().await.unwrap();
 
     assert_eq!(msg, "success");
-    assert!(content.contains(&"memory".to_string()));
-    assert!(content.contains(&"syntax".to_string()));
-    assert_eq!(content.len(), 2);
+
+    // Check expected tags are present
+    assert!(content.contains(&"ownership".to_string()));
+    assert!(content.contains(&"borrowing".to_string()));
+    assert!(content.contains(&"match".to_string()));
+
+    // Check deduplication, exact count if known
+    assert_eq!(content.len(), 3);
 }
