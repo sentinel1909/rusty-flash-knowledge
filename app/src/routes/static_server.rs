@@ -18,7 +18,7 @@ pub fn static_error2response(e: &ServeError) -> StatusCode {
     }
 }
 
-// the StaticServer type from `pavex_static_files` returns a `StaticFile` type, embodying the asset 
+// the StaticServer type from `pavex_static_files` returns a `StaticFile` type, embodying the asset
 // to be served. To deal with the orphan rule around foreign types, we do a "NewType" pattern on it,
 // this enables implementing the `TypedBody` trait from Pavex.
 struct ServedStaticFile(StaticFile);
@@ -43,7 +43,7 @@ pub fn get(
     request_head: &RequestHead,
 ) -> Result<Response, ServeError> {
     let request_path = request_head.target.path();
-    
+
     let file = static_server.read_file(request_path)?;
 
     Ok(Response::ok().set_typed_body(ServedStaticFile(file)))

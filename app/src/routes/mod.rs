@@ -96,7 +96,7 @@ fn public_api_bp() -> Blueprint {
 // web asset routes
 fn web_bp() -> Blueprint {
     let mut bp = Blueprint::new();
-     bp.route(GET, "/", f!(self::index::get))
+    bp.route(GET, "/", f!(self::index::get))
         .error_handler(f!(crate::routes::index::template_error2response));
     bp.route(GET, "/static/{filename}", f!(self::static_server::get))
         .error_handler(f!(crate::routes::static_server::static_error2response));
