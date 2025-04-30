@@ -2,6 +2,7 @@
 
 // dependencies
 use crate::{configuration, routes, telemetry};
+use pavex::f;
 use pavex::blueprint::Blueprint;
 use pavex::kit::ApiKit;
 
@@ -14,5 +15,7 @@ pub fn blueprint() -> Blueprint {
     configuration::register(&mut bp);
 
     routes::register(&mut bp);
+    bp.singleton(f!(pavex_template::TemplateEngine::from_config));
+    bp.transient(f!(pavex_static_files::StaticServer::from_config));
     bp
 }

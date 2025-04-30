@@ -1,0 +1,49 @@
+<!-- index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- set up some preloaders, so the browser knows about them as soon as possible -->
+    <link rel="preload" href="styles/screen.css" as="style" />
+    <link rel="preload" href="scripts/scripts.js" as="script" />
+    <title>Rusty Flash Knowledge | Home</title>
+    <link rel="stylesheet" type="text/css" href="styles/screen.css" media="screen" />
+    <link rel="icon" type="image/x-icon" href="static/favicon.ico" />
+</head>
+<body>
+    <header>
+        <h1>Rusty Flash Knowledge</h1>
+        <h2>Random questions to test your Rust knowledge</h2>
+    </header>
+    <main>
+        <section>
+            <article>
+                <p>Click the "Q" button below to display a question. Then click the "A" button to display the answer.</p>
+            </article>
+            <br />
+            <article>
+                <h3>Question:</h3>
+                <p id = "question_text"></p>
+                <button id="question_button">Q</button>
+            </article>
+            <br />
+            <article>
+                <h3>Answer:</h3>
+                <p id="answer_text"></p>
+                <button id="answer_button">A</button>
+            </article>
+            <br />
+            <article>
+                <button id = "reset_button">Reset</button>
+            </article>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; <span id="year"></span> Jeffery D. Mitchell</p>
+    </footer>
+    <script src="scripts/scripts.js"></script>
+    <noscript><p>This site works best with JavaScript enabled in your browser.</p></noscript>
+</body>
+</html>
