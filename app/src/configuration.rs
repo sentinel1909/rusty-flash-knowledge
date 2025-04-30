@@ -17,6 +17,11 @@ pub fn register(bp: &mut Blueprint) {
     bp.config("server", t!(self::ServerConfig));
     bp.config("database", t!(self::DatabaseConfig));
     bp.config("authorization", t!(self::AuthConfig));
+    bp.config("templateconfig", t!(pavex_template::TemplateConfig));
+    bp.config(
+        "staticserverconfig",
+        t!(pavex_static_files::StaticServerConfig),
+    );
 }
 
 // struct type to represent server configuration

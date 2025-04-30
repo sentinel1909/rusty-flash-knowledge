@@ -3,7 +3,9 @@
 // modules into scope
 pub mod flashcards;
 pub mod health;
+pub mod index;
 pub mod preflight;
+pub mod static_server;
 
 // dependencies
 use pavex::blueprint::{
@@ -12,8 +14,34 @@ use pavex::blueprint::{
 };
 use pavex::f;
 
+// protected routes, require an API key to access
+fn api_bp() -> Blueprint {
+    let mut bp = Blueprint::new();
+    bp.pre_process(f!(crate::middleware::validate_api_key))
+        .error_handler(f!(crate::errors::api_error2response));
+    bp.route(
+        POST,
+        "/flashcards",
+        f!(self::flashcards::create_flashcard_handler),
+    )
+    .error_handler(f!(crate::errors::api_error2response));
+    bp.route(
+        PUT,
+        "/flashcards/{id}",
+        f!(self::flashcards::update_flashcard_handler),
+    )
+    .error_handler(f!(crate::errors::api_error2response));
+    bp.route(
+        DELETE,
+        "/flashcards/{id}",
+        f!(self::flashcards::delete_flashcard_handler),
+    )
+    .error_handler(f!(crate::errors::api_error2response));
+    bp
+}
+
 // public routes, no API key required
-fn public_bp() -> Blueprint {
+fn public_api_bp() -> Blueprint {
     let mut bp = Blueprint::new();
     bp.post_process(f!(crate::middleware::add_cors_headers));
     bp.route(GET, "/flashcards/health", f!(self::health::check_health));
@@ -65,36 +93,21 @@ fn public_bp() -> Blueprint {
     bp
 }
 
-// protected routes, require an API key to access
-fn api_bp() -> Blueprint {
+// web asset routes
+fn web_bp() -> Blueprint {
     let mut bp = Blueprint::new();
-    bp.pre_process(f!(crate::middleware::validate_api_key))
-        .error_handler(f!(crate::errors::api_error2response));
-    bp.route(
-        POST,
-        "/flashcards",
-        f!(self::flashcards::create_flashcard_handler),
-    )
-    .error_handler(f!(crate::errors::api_error2response));
-    bp.route(
-        PUT,
-        "/flashcards/{id}",
-        f!(self::flashcards::update_flashcard_handler),
-    )
-    .error_handler(f!(crate::errors::api_error2response));
-    bp.route(
-        DELETE,
-        "/flashcards/{id}",
-        f!(self::flashcards::delete_flashcard_handler),
-    )
-    .error_handler(f!(crate::errors::api_error2response));
+     bp.route(GET, "/", f!(self::index::get))
+        .error_handler(f!(crate::routes::index::template_error2response));
+    bp.route(GET, "/static/{filename}", f!(self::static_server::get))
+        .error_handler(f!(crate::routes::static_server::static_error2response));
     bp
 }
 
 // combine the public and private routes and register them
 pub fn register(bp: &mut Blueprint) {
-    bp.domain("rusty-flash-knowledge.net").nest(public_bp());
+    bp.domain("rusty-flash-knowledge.net").nest(public_api_bp());
     bp.domain("api.rusty-flash-knowledge.net")
         .prefix("/v1")
         .nest(api_bp());
+    bp.domain("app.rusty-flash-knowledge.net").nest(web_bp());
 }
