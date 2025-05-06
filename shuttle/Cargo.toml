@@ -1,0 +1,16 @@
+[package]
+name = "shuttle"
+version.workspace = true
+edition.workspace = true
+description.workspace = true
+authors.workspace = true
+readme.workspace = true
+repository.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+pavex = "0.1.80"
+server = { path = "../server" }
+server_sdk = { path = "../server_sdk" }
+shuttle-runtime = { version = "0.53.0", features = ["setup-otel-exporter"] }

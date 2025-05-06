@@ -11,3 +11,7 @@ Caddyfile
 
 # Environment variables
 .env
+
+# Shuttle Environment variables
+Secrets*.toml
+
