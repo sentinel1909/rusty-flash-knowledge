@@ -14,3 +14,4 @@ pavex = "0.1.80"
 server = { path = "../server" }
 server_sdk = { path = "../server_sdk" }
 shuttle-runtime = { version = "0.53.0", features = ["setup-otel-exporter"] }
+tracing = "0.1.41"
