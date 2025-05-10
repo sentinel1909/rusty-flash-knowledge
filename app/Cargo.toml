@@ -27,9 +27,10 @@ pavex = { version = "0.1.80" }
 pavex_tracing = { version = "0.1.80" }
 pavex_cli_client = { version = "0.1.80" }
 pavex_session = "0.1.80"
-pavex_session_memory_store = "0.1.80"
 pavex_static_files = { git = "https://github.com/sentinel1909/pavex_static_files.git", rev = "5ced7ab" }
-pavex_template = { git = "https://github.com/sentinel1909/pavex_template.git", features = [ "serde" ], rev = "a77ac38"}
+pavex_template = { git = "https://github.com/sentinel1909/pavex_template.git", features = [
+    "serde",
+], rev = "a77ac38" }
 tracing = "0.1"
 tracing-log = "0.2.0"
 tracing_log_error = "0.1"
