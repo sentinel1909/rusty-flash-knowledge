@@ -104,13 +104,15 @@ checksum = "dcfed56ad506cb2c684a14971b8861fdc3baaaae314b9e5f9bb532cbe3ba7a4f"
 
 [[package]]
 name = "app"
-version = "0.13.2"
+version = "0.13.3"
 dependencies = [
  "cargo_px_env",
  "humantime-serde",
  "jiff-sqlx",
  "pavex",
  "pavex_cli_client",
+ "pavex_session",
+ "pavex_session_memory_store",
  "pavex_static_files",
  "pavex_template",
  "pavex_tracing",
@@ -133,6 +135,17 @@ name = "arrayvec"
 version = "0.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7c02d123df017efcdfbd739ef81735b36c5ba83ec3c59c80a9d7ecc718f92e50"
+
+[[package]]
+name = "async-trait"
+version = "0.1.88"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e539d3fca749fcee5236ab05e93a52867dd549cc157c8cb7f99595f3cedffdb5"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
 
 [[package]]
 name = "atoi"
@@ -1727,6 +1740,38 @@ dependencies = [
 ]
 
 [[package]]
+name = "pavex_session"
+version = "0.1.80"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "268ab133c2b4b79c0330c04763fe4c9eb97a610980cda5b26eb1e6a40ecbefab"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "pavex",
+ "pavex_tracing",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tokio",
+ "tracing",
+ "uuid",
+]
+
+[[package]]
+name = "pavex_session_memory_store"
+version = "0.1.80"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7b43ae35a0adaacd0bdd571c41ea2c4db5d995ef03701744eee70b6629a659b3"
+dependencies = [
+ "async-trait",
+ "pavex",
+ "pavex_session",
+ "serde_json",
+ "tokio",
+ "tracing",
+]
+
+[[package]]
 name = "pavex_static_files"
 version = "0.6.0"
 source = "git+https://github.com/sentinel1909/pavex_static_files.git?rev=5ced7ab#5ced7abe2ecebbd6eb50d6bb361b82c17b4e271b"
@@ -2509,7 +2554,7 @@ dependencies = [
 
 [[package]]
 name = "server"
-version = "0.13.2"
+version = "0.13.3"
 dependencies = [
  "anyhow",
  "app",
@@ -2532,7 +2577,7 @@ dependencies = [
 
 [[package]]
 name = "server_sdk"
-version = "0.13.2"
+version = "0.13.3"
 dependencies = [
  "app",
  "http",
@@ -3655,7 +3700,7 @@ version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cf221c93e13a30d793f7645a0e7762c55d169dbb0a49671918a2319d289b10bb"
 dependencies = [
- "windows-sys 0.48.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
