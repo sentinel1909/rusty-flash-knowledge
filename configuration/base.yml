@@ -9,8 +9,10 @@ templateconfig:
   dir: "templates"
   pattern: "/**/*"
   extra_templates:
-    - path: "index.html"
-      name: "index"
+     - path: "base.html"
+       name: "base"
+     - path: "index.html"
+       nanme: "index"
 staticserverconfig:
   mount_path: "/static"
   root_dir: "static"

@@ -11,6 +11,8 @@ use reqwest::header::{AUTHORIZATION, HOST};
 use server::configuration::Profile;
 use server_sdk::{ApplicationConfig, ApplicationState, run};
 use sqlx::{Connection, Executor, PgConnection, PgPool};
+use std::borrow::Cow;
+use std::path::PathBuf;
 use std::sync::Once;
 use tracing::subscriber::set_global_default;
 use tracing_subscriber::EnvFilter;
@@ -51,6 +53,8 @@ impl TestApi {
         Self::init_telemetry();
         let mut config = Self::get_config();
         config.database.database_name = Uuid::new_v4().to_string();
+        config.templateconfig.dir = Cow::Owned("../templates".to_string());
+        config.staticserverconfig.root_dir = PathBuf::from("../static");
         configure_database(&config).await;
         let tcp_listener = config
             .server

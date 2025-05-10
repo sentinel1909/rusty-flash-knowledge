@@ -2580,10 +2580,13 @@ name = "server_sdk"
 version = "0.14.0"
 dependencies = [
  "app",
+ "biscotti",
  "http",
  "hyper",
  "matchit",
  "pavex",
+ "pavex_session",
+ "pavex_session_memory_store",
  "pavex_static_files",
  "pavex_template",
  "pavex_tracing",

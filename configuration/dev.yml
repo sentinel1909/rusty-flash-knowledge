@@ -4,12 +4,6 @@
 server:
   ip: "127.0.0.1"
   port: 8000
-templateconfig:
-  dir: "../templates"
-  pattern: "/**/*"
-  extra_templates:
-    - path: "index.html"
-      name: "index"
 database:
   host: "127.0.0.1"
   port: 5432
