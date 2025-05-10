@@ -104,7 +104,7 @@ checksum = "dcfed56ad506cb2c684a14971b8861fdc3baaaae314b9e5f9bb532cbe3ba7a4f"
 
 [[package]]
 name = "app"
-version = "0.14.2"
+version = "0.14.3"
 dependencies = [
  "cargo_px_env",
  "humantime-serde",
@@ -112,6 +112,7 @@ dependencies = [
  "pavex",
  "pavex_cli_client",
  "pavex_session",
+ "pavex_session_sqlx",
  "pavex_static_files",
  "pavex_template",
  "pavex_tracing",
@@ -1757,6 +1758,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "pavex_session_sqlx"
+version = "0.1.80"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dd9de422b7537b8396eee44d9ae663221cbddca2b40bd9135f0a6eb61f3b1a52"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "jiff-sqlx",
+ "pavex",
+ "pavex_session",
+ "serde_json",
+ "sqlx",
+ "tokio",
+ "tracing",
+]
+
+[[package]]
 name = "pavex_static_files"
 version = "0.6.0"
 source = "git+https://github.com/sentinel1909/pavex_static_files.git?rev=5ced7ab#5ced7abe2ecebbd6eb50d6bb361b82c17b4e271b"
@@ -2539,7 +2557,7 @@ dependencies = [
 
 [[package]]
 name = "server"
-version = "0.14.2"
+version = "0.14.3"
 dependencies = [
  "anyhow",
  "app",
@@ -2562,7 +2580,7 @@ dependencies = [
 
 [[package]]
 name = "server_sdk"
-version = "0.14.2"
+version = "0.14.3"
 dependencies = [
  "app",
  "biscotti",
