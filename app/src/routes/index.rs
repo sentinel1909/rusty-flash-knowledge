@@ -5,7 +5,7 @@ use pavex::{
     http::StatusCode,
     response::{Response, body::Html},
 };
-use pavex_template::{Context, TemplateEngine, TemplateError};
+use pavex_tera_template::{Context, TemplateEngine, TemplateError};
 
 // error handler for the index endpoint
 pub fn template_error2response(e: &TemplateError) -> StatusCode {

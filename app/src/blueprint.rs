@@ -2,9 +2,9 @@
 
 // dependencies
 use crate::{configuration, routes, telemetry};
-use pavex::f;
 use pavex::blueprint::Blueprint;
 use pavex::cookie::CookieKit;
+use pavex::f;
 use pavex::kit::ApiKit;
 use pavex_session_sqlx::PostgresSessionKit;
 
@@ -19,7 +19,8 @@ pub fn blueprint() -> Blueprint {
     configuration::register(&mut bp);
 
     routes::register(&mut bp);
-    bp.singleton(f!(pavex_template::TemplateEngine::from_config));
+    bp.singleton(f!(crate::configuration::DatabaseConfig::get_pool));
+    bp.singleton(f!(pavex_tera_template::TemplateEngine::from_config));
     bp.transient(f!(pavex_static_files::StaticServer::from_config));
     bp
 }

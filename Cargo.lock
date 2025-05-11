@@ -104,7 +104,7 @@ checksum = "dcfed56ad506cb2c684a14971b8861fdc3baaaae314b9e5f9bb532cbe3ba7a4f"
 
 [[package]]
 name = "app"
-version = "0.14.3"
+version = "0.14.4"
 dependencies = [
  "cargo_px_env",
  "humantime-serde",
@@ -114,7 +114,7 @@ dependencies = [
  "pavex_session",
  "pavex_session_sqlx",
  "pavex_static_files",
- "pavex_template",
+ "pavex_tera_template",
  "pavex_tracing",
  "secrecy",
  "serde",
@@ -1784,9 +1784,9 @@ dependencies = [
 ]
 
 [[package]]
-name = "pavex_template"
-version = "0.4.1"
-source = "git+https://github.com/sentinel1909/pavex_template.git?rev=a77ac38#a77ac38a9b1bf0754e0b6c0708739bae5db44519"
+name = "pavex_tera_template"
+version = "0.4.2"
+source = "git+https://github.com/sentinel1909/pavex_tera_template.git?rev=1fa1136#1fa1136ee27f69b76404e1e1f0f88783eedba949"
 dependencies = [
  "serde",
  "tera",
@@ -2557,7 +2557,7 @@ dependencies = [
 
 [[package]]
 name = "server"
-version = "0.14.3"
+version = "0.14.4"
 dependencies = [
  "anyhow",
  "app",
@@ -2580,7 +2580,7 @@ dependencies = [
 
 [[package]]
 name = "server_sdk"
-version = "0.14.3"
+version = "0.14.4"
 dependencies = [
  "app",
  "biscotti",
@@ -2588,10 +2588,14 @@ dependencies = [
  "hyper",
  "matchit",
  "pavex",
+ "pavex_session",
+ "pavex_session_sqlx",
  "pavex_static_files",
- "pavex_template",
+ "pavex_tera_template",
  "pavex_tracing",
  "serde",
+ "sqlx-core",
+ "sqlx-postgres",
  "thiserror",
 ]
 
