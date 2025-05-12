@@ -15,7 +15,7 @@ use pavex::blueprint::{
 use pavex::f;
 
 // protected routes, require an API key to access
-fn api_bp() -> Blueprint {
+fn admin_api_bp() -> Blueprint {
     let mut bp = Blueprint::new();
     bp.pre_process(f!(crate::middleware::validate_api_key))
         .error_handler(f!(crate::errors::api_error2response));
@@ -105,9 +105,11 @@ fn web_bp() -> Blueprint {
 
 // combine the public and private routes and register them
 pub fn register(bp: &mut Blueprint) {
-    bp.domain("rusty-flash-knowledge.net").nest(public_api_bp());
+    bp.domain("rusty-flash-knowledge.net")
+        .prefix("/v1")
+        .nest(public_api_bp());
     bp.domain("api.rusty-flash-knowledge.net")
         .prefix("/v1")
-        .nest(api_bp());
+        .nest(admin_api_bp());
     bp.domain("app.rusty-flash-knowledge.net").nest(web_bp());
 }

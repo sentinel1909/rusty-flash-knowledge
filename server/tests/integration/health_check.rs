@@ -8,7 +8,7 @@ async fn health_returns_200_ok() {
 
     let response = api
         .api_client
-        .get(format!("{}/flashcards/health", api.api_address))
+        .get(format!("{}/v1/flashcards/health", api.api_address))
         .header(HOST, "rusty-flash-knowledge.net")
         .send()
         .await

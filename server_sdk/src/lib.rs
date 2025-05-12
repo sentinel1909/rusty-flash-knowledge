@@ -148,12 +148,12 @@ impl Router {
     }
     fn domain_2_router() -> matchit::Router<u32> {
         let mut router = matchit::Router::new();
-        router.insert("/flashcards", 0u32).unwrap();
-        router.insert("/flashcards/health", 1u32).unwrap();
-        router.insert("/flashcards/random", 2u32).unwrap();
-        router.insert("/flashcards/tags", 3u32).unwrap();
-        router.insert("/flashcards/topics", 4u32).unwrap();
-        router.insert("/flashcards/{id}", 5u32).unwrap();
+        router.insert("/v1/flashcards", 0u32).unwrap();
+        router.insert("/v1/flashcards/health", 1u32).unwrap();
+        router.insert("/v1/flashcards/random", 2u32).unwrap();
+        router.insert("/v1/flashcards/tags", 3u32).unwrap();
+        router.insert("/v1/flashcards/topics", 4u32).unwrap();
+        router.insert("/v1/flashcards/{id}", 5u32).unwrap();
         router
     }
     pub async fn route(
@@ -466,7 +466,7 @@ impl Router {
                 match &request_head.method {
                     &pavex::http::Method::GET => {
                         let matched_route_template = pavex::request::path::MatchedPathPattern::new(
-                            "/flashcards",
+                            "/v1/flashcards",
                         );
                         route_10::entrypoint(
                                 &state.database_config,
@@ -480,7 +480,7 @@ impl Router {
                     }
                     &pavex::http::Method::OPTIONS => {
                         let matched_route_template = pavex::request::path::MatchedPathPattern::new(
-                            "/flashcards",
+                            "/v1/flashcards",
                         );
                         route_12::entrypoint(
                                 &state.session_store,
@@ -498,7 +498,7 @@ impl Router {
                             ])
                             .into();
                         let matched_route_template = pavex::request::path::MatchedPathPattern::new(
-                            "/flashcards",
+                            "/v1/flashcards",
                         );
                         route_0::entrypoint(
                                 &state.processor,
@@ -516,7 +516,7 @@ impl Router {
                 match &request_head.method {
                     &pavex::http::Method::GET => {
                         let matched_route_template = pavex::request::path::MatchedPathPattern::new(
-                            "/flashcards/health",
+                            "/v1/flashcards/health",
                         );
                         route_6::entrypoint(
                                 &state.session_store,
@@ -533,7 +533,7 @@ impl Router {
                             ])
                             .into();
                         let matched_route_template = pavex::request::path::MatchedPathPattern::new(
-                            "/flashcards/health",
+                            "/v1/flashcards/health",
                         );
                         route_0::entrypoint(
                                 &state.processor,
@@ -551,7 +551,7 @@ impl Router {
                 match &request_head.method {
                     &pavex::http::Method::GET => {
                         let matched_route_template = pavex::request::path::MatchedPathPattern::new(
-                            "/flashcards/random",
+                            "/v1/flashcards/random",
                         );
                         route_7::entrypoint(
                                 &state.processor,
@@ -565,7 +565,7 @@ impl Router {
                     }
                     &pavex::http::Method::OPTIONS => {
                         let matched_route_template = pavex::request::path::MatchedPathPattern::new(
-                            "/flashcards/random",
+                            "/v1/flashcards/random",
                         );
                         route_14::entrypoint(
                                 &state.session_store,
@@ -583,7 +583,7 @@ impl Router {
                             ])
                             .into();
                         let matched_route_template = pavex::request::path::MatchedPathPattern::new(
-                            "/flashcards/random",
+                            "/v1/flashcards/random",
                         );
                         route_0::entrypoint(
                                 &state.processor,
@@ -601,7 +601,7 @@ impl Router {
                 match &request_head.method {
                     &pavex::http::Method::GET => {
                         let matched_route_template = pavex::request::path::MatchedPathPattern::new(
-                            "/flashcards/tags",
+                            "/v1/flashcards/tags",
                         );
                         route_8::entrypoint(
                                 &state.processor,
@@ -619,7 +619,7 @@ impl Router {
                             ])
                             .into();
                         let matched_route_template = pavex::request::path::MatchedPathPattern::new(
-                            "/flashcards/tags",
+                            "/v1/flashcards/tags",
                         );
                         route_0::entrypoint(
                                 &state.processor,
@@ -637,7 +637,7 @@ impl Router {
                 match &request_head.method {
                     &pavex::http::Method::GET => {
                         let matched_route_template = pavex::request::path::MatchedPathPattern::new(
-                            "/flashcards/topics",
+                            "/v1/flashcards/topics",
                         );
                         route_9::entrypoint(
                                 &state.processor,
@@ -655,7 +655,7 @@ impl Router {
                             ])
                             .into();
                         let matched_route_template = pavex::request::path::MatchedPathPattern::new(
-                            "/flashcards/topics",
+                            "/v1/flashcards/topics",
                         );
                         route_0::entrypoint(
                                 &state.processor,
@@ -673,7 +673,7 @@ impl Router {
                 match &request_head.method {
                     &pavex::http::Method::GET => {
                         let matched_route_template = pavex::request::path::MatchedPathPattern::new(
-                            "/flashcards/{id}",
+                            "/v1/flashcards/{id}",
                         );
                         route_11::entrypoint(
                                 url_params,
@@ -688,7 +688,7 @@ impl Router {
                     }
                     &pavex::http::Method::OPTIONS => {
                         let matched_route_template = pavex::request::path::MatchedPathPattern::new(
-                            "/flashcards/{id}",
+                            "/v1/flashcards/{id}",
                         );
                         route_13::entrypoint(
                                 &state.session_store,
@@ -706,7 +706,7 @@ impl Router {
                             ])
                             .into();
                         let matched_route_template = pavex::request::path::MatchedPathPattern::new(
-                            "/flashcards/{id}",
+                            "/v1/flashcards/{id}",
                         );
                         route_0::entrypoint(
                                 &state.processor,
