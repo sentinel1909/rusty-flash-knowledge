@@ -20,13 +20,7 @@ async fn get_random_flashcard_returns_200() {
     };
     api.create_flashcard(&card).await;
 
-    let response = api
-        .api_client
-        .get(format!("{}/flashcards/random", api.api_address))
-        .header(HOST, "rusty-flash-knowledge.net")
-        .send()
-        .await
-        .unwrap();
+    let response = api.get_random_flashcard().await;
 
     assert_eq!(response.status(), StatusCode::OK);
     let body = response.text().await.unwrap();

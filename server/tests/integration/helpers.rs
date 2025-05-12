@@ -160,7 +160,7 @@ impl TestApi {
 
     pub async fn get_flashcards(&self) -> reqwest::Response {
         self.api_client
-            .get(format!("{}/flashcards", &self.api_address))
+            .get(format!("{}/v1/flashcards", &self.api_address))
             .header(HOST, "rusty-flash-knowledge.net")
             .send()
             .await
@@ -169,8 +169,8 @@ impl TestApi {
 
     pub async fn get_flashcards_by_topic(&self, query: Option<&str>) -> reqwest::Response {
         let url = match query {
-            Some(topic) => format!("{}/flashcards?topic={}", &self.api_address, topic),
-            None => format!("{}/flashcards", &self.api_address),
+            Some(topic) => format!("{}/v1/flashcards?topic={}", &self.api_address, topic),
+            None => format!("{}/v1/flashcards", &self.api_address),
         };
         self.api_client
             .get(url)
@@ -182,7 +182,7 @@ impl TestApi {
 
     pub async fn get_flashcards_by_tag(&self, query: Option<&str>) -> reqwest::Response {
         let url = match query {
-            Some(tag) => format!("{}/flashcards?tag={}", &self.api_address, tag),
+            Some(tag) => format!("{}/v1/flashcards?tag={}", &self.api_address, tag),
             None => format!("{}/flashcards", &self.api_address),
         };
         self.api_client
@@ -195,7 +195,7 @@ impl TestApi {
 
     pub async fn get_all_tags(&self) -> reqwest::Response {
         self.api_client
-            .get(format!("{}/flashcards/tags", &self.api_address))
+            .get(format!("{}/v1/flashcards/tags", &self.api_address))
             .header(HOST, "rusty-flash-knowledge.net")
             .send()
             .await
@@ -204,7 +204,7 @@ impl TestApi {
 
     pub async fn get_all_topics(&self) -> reqwest::Response {
         self.api_client
-            .get(format!("{}/flashcards/topics", &self.api_address))
+            .get(format!("{}/v1/flashcards/topics", &self.api_address))
             .header(HOST, "rusty-flash-knowledge.net")
             .send()
             .await
@@ -213,7 +213,16 @@ impl TestApi {
 
     pub async fn get_flashcard(&self, id: String) -> reqwest::Response {
         self.api_client
-            .get(format!("{}/flashcards/{}", &self.api_address, id))
+            .get(format!("{}/v1/flashcards/{}", &self.api_address, id))
+            .header(HOST, "rusty-flash-knowledge.net")
+            .send()
+            .await
+            .expect("Failed to execute request.")
+    }
+
+    pub async fn get_random_flashcard(&self) -> reqwest::Response {
+        self.api_client
+            .get(format!("{}/v1/flashcards/random", &self.api_address))
             .header(HOST, "rusty-flash-knowledge.net")
             .send()
             .await
