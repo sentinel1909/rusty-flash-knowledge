@@ -104,7 +104,7 @@ checksum = "dcfed56ad506cb2c684a14971b8861fdc3baaaae314b9e5f9bb532cbe3ba7a4f"
 
 [[package]]
 name = "app"
-version = "0.14.5"
+version = "0.14.6"
 dependencies = [
  "cargo_px_env",
  "humantime-serde",
@@ -2557,7 +2557,7 @@ dependencies = [
 
 [[package]]
 name = "server"
-version = "0.14.5"
+version = "0.14.6"
 dependencies = [
  "anyhow",
  "app",
@@ -2580,7 +2580,7 @@ dependencies = [
 
 [[package]]
 name = "server_sdk"
-version = "0.14.5"
+version = "0.14.6"
 dependencies = [
  "app",
  "biscotti",

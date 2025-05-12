@@ -12,7 +12,7 @@ year.textContent = currentYear;
 const q_text = document.getElementById("question_text");
 const a_text = document.getElementById("answer_text");
 let answer;
-const fetch_url = "https://rusty-flash-knowledge.net/flashcards/random";
+const fetch_url = "https://rusty-flash-knowledge.net/v1/flashcards/random";
 
 // eventlistener for the question button
 const q_button = document.getElementById("question_button");
