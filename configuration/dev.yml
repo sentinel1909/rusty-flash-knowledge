@@ -13,3 +13,9 @@ database:
   require_ssl: false
 authorization:
   api_key: "supersecretapikey"
+cookies:
+  crypto_rules:
+    - cookie_names: ["last_visited"]
+      algorithm: "Signing"
+      key: [41,  87,  12,  203,  56,  99,  172,  255, 0,   1,   202,  33,  44,  155,  6,   77, 88,  19,  210,  11,  112,  13,  94,  215, 16,  117,  218,  29,  120,  21,  222,  23, 24,  225,  126, 37,  38,  239,  40,  241, 42,  243,  244,  45,  246,  247,  248,  49, 50,  251,  52,  253,  54,  255,  56,  57, 58,  59,  60,  61,  62,  63,  64,  65]
+

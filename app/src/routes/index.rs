@@ -2,8 +2,10 @@
 
 // dependencies
 use pavex::{
+    cookie::{ResponseCookie, ResponseCookies},
     http::StatusCode,
     response::{Response, body::Html},
+    time::Zoned,
 };
 use pavex_tera_template::{Context, TemplateEngine, TemplateError};
 
@@ -15,7 +17,12 @@ pub fn template_error2response(e: &TemplateError) -> StatusCode {
 }
 
 // handler which returns the index page template
-pub fn get(template: &TemplateEngine) -> Result<Response, TemplateError> {
+pub fn get(response_cookies: &mut ResponseCookies, template: &TemplateEngine) -> Result<Response, TemplateError> {
+    let now = Zoned::now().to_string();
+    let cookie = ResponseCookie::new("last_visited", now)
+        .set_path("/");
+
+    response_cookies.insert(cookie);
     let context = Context::new();
 
     let body: Html = template.render("index.html", &context)?.into();

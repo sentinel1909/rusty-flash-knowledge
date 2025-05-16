@@ -957,17 +957,18 @@ pub mod route_1 {
         s_5: &'d pavex_session::SessionConfig,
         s_6: &'e pavex::request::RequestHead,
     ) -> pavex::response::Response {
-        let response = wrapping_1(s_0.clone(), s_1).await;
+        let response = wrapping_1(s_0.clone(), &mut s_2, s_1).await;
         let response = post_processing_1(response, s_4, s_5, s_6, s_3, &s_0, &mut s_2)
             .await;
         let response = post_processing_2(response, s_2, &s_0, s_3).await;
         response
     }
-    async fn stage_2<'a, 'b>(
+    async fn stage_2<'a, 'b, 'c>(
         s_0: &'a pavex_tracing::RootSpan,
         s_1: &'b pavex_tera_template::TemplateEngine,
+        s_2: &'c mut pavex::cookie::ResponseCookies,
     ) -> pavex::response::Response {
-        let response = handler(s_0, s_1).await;
+        let response = handler(s_1, s_0, s_2).await;
         let response = post_processing_0(response, s_0).await;
         response
     }
@@ -998,37 +999,40 @@ pub mod route_1 {
     }
     async fn wrapping_1(
         v0: pavex_tracing::RootSpan,
-        v1: &pavex_tera_template::TemplateEngine,
+        v1: &mut pavex::cookie::ResponseCookies,
+        v2: &pavex_tera_template::TemplateEngine,
     ) -> pavex::response::Response {
-        let v2 = crate::route_1::Next1 {
+        let v3 = crate::route_1::Next1 {
             s_0: &v0,
-            s_1: v1,
+            s_1: v2,
+            s_2: v1,
             next: stage_2,
         };
-        let v3 = pavex::middleware::Next::new(v2);
-        let v4 = <pavex_tracing::RootSpan as core::clone::Clone>::clone(&v0);
-        let v5 = pavex_tracing::logger(v4, v3).await;
-        <pavex::response::Response as pavex::response::IntoResponse>::into_response(v5)
+        let v4 = pavex::middleware::Next::new(v3);
+        let v5 = <pavex_tracing::RootSpan as core::clone::Clone>::clone(&v0);
+        let v6 = pavex_tracing::logger(v5, v4).await;
+        <pavex::response::Response as pavex::response::IntoResponse>::into_response(v6)
     }
     async fn handler(
-        v0: &pavex_tracing::RootSpan,
-        v1: &pavex_tera_template::TemplateEngine,
+        v0: &pavex_tera_template::TemplateEngine,
+        v1: &pavex_tracing::RootSpan,
+        v2: &mut pavex::cookie::ResponseCookies,
     ) -> pavex::response::Response {
-        let v2 = app::routes::index::get(v1);
-        let v3 = match v2 {
+        let v3 = app::routes::index::get(v2, v0);
+        let v4 = match v3 {
             Ok(ok) => ok,
-            Err(v3) => {
+            Err(v4) => {
                 return {
-                    let v4 = app::routes::index::template_error2response(&v3);
-                    let v5 = pavex::Error::new(v3);
-                    app::telemetry::error_logger(&v5, v0).await;
+                    let v5 = app::routes::index::template_error2response(&v4);
+                    let v6 = pavex::Error::new(v4);
+                    app::telemetry::error_logger(&v6, v1).await;
                     <http::StatusCode as pavex::response::IntoResponse>::into_response(
-                        v4,
+                        v5,
                     )
                 };
             }
         };
-        <pavex::response::Response as pavex::response::IntoResponse>::into_response(v3)
+        <pavex::response::Response as pavex::response::IntoResponse>::into_response(v4)
     }
     async fn post_processing_0(
         v0: pavex::response::Response,
@@ -1145,25 +1149,27 @@ pub mod route_1 {
             )
         }
     }
-    struct Next1<'a, 'b, T>
+    struct Next1<'a, 'b, 'c, T>
     where
         T: std::future::Future<Output = pavex::response::Response>,
     {
         s_0: &'a pavex_tracing::RootSpan,
         s_1: &'b pavex_tera_template::TemplateEngine,
+        s_2: &'c mut pavex::cookie::ResponseCookies,
         next: fn(
             &'a pavex_tracing::RootSpan,
             &'b pavex_tera_template::TemplateEngine,
+            &'c mut pavex::cookie::ResponseCookies,
         ) -> T,
     }
-    impl<'a, 'b, T> std::future::IntoFuture for Next1<'a, 'b, T>
+    impl<'a, 'b, 'c, T> std::future::IntoFuture for Next1<'a, 'b, 'c, T>
     where
         T: std::future::Future<Output = pavex::response::Response>,
     {
         type Output = pavex::response::Response;
         type IntoFuture = T;
         fn into_future(self) -> Self::IntoFuture {
-            (self.next)(self.s_0, self.s_1)
+            (self.next)(self.s_0, self.s_1, self.s_2)
         }
     }
 }
