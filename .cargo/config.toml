@@ -1,2 +1,5 @@
 [env]
 PX_PROFILE = { value = "dev" }
+
+[patch."crates-io"]
+figment = { git = "https://github.com/thorio/figment", branch = "feature/integer-indexing" }
